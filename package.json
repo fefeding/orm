@@ -1,0 +1,19 @@
+{
+  "name": "@lct/common",
+  "version": "1.0.1",
+  "description": "理财通中后台基础类库",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./index.js"
+  },
+  "types": "./typings/*.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git@git.code.oa.com:fmp/common.git"
+  },
+  "keywords": [
+    "fmp"
+  ],
+  "author": "fefeding",
+  "license": "MIT"
+}
