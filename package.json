@@ -1,12 +1,12 @@
 {
   "name": "@lct/common",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "理财通中后台基础类库",
   "main": "index.js",
   "scripts": {
-    "test": "node ./index.js"
+    "test": "tsc & node ./index"
   },
-  "types": "./typings/*.d.ts",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/jiamao/lct-common.git"

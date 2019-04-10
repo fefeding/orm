@@ -1,3 +1,8 @@
 
-export { default as BaseModel } from "./model/base";
-export { default as DBHelper } from "./helper/db";
+import BaseModel from "./model/base";
+import DBHelper from "./helper/db";
+
+export {
+    BaseModel,
+    DBHelper
+}
