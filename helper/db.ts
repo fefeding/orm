@@ -1,4 +1,4 @@
-
+/// <reference path="../typings/index.d.ts" />
 /**
  * 提供DB操作基础库
  * 支持分页等功能
@@ -19,6 +19,7 @@ class DBHelper {
     }
 
     static async update(pars: IDBSqlParam): Promise<number> {
+        pars.sql += '1';
         return 1;
     }
 }

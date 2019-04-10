@@ -15,16 +15,16 @@ declare interface IDBParam {
      * 操作DB原生接口
      */
     db: {
-        select: function;
-        query: function;
-        update: function;
-        insert: function;
-        delete: function;
-        get: function;
-        beginTransaction: function;
-        beginTransactionScope: function;
-        commit: function;
-        rollback: function;        
+        select: Function;
+        query: Function;
+        update: Function;
+        insert: Function;
+        delete: Function;
+        get: Function;
+        beginTransaction: Function;
+        beginTransactionScope: Function;
+        commit: Function;
+        rollback: Function;        
     }
 }
 

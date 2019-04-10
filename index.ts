@@ -1,8 +1,6 @@
 
-import BaseModel from "./model/base";
-import DBHelper from "./helper/db";
+import base from "./model/base";
+import db from "./helper/db";
 
-export {
-    BaseModel,
-    DBHelper
-}
+export const BaseModel = base;
+export const DBHelper = db;
