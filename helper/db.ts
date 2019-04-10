@@ -10,15 +10,17 @@ class DBHelper {
      * @param {IDBSqlParam} pars 执行sql参数
      * @returns {IDBResult}
      */
-    async query(pars: IDBSqlParam): Promise<IDBResult> {
+    static async query(pars: IDBSqlParam): Promise<IDBResult> {
         let result = {
             data: null
         };
         result.data = await pars.db.query(pars.sql, pars.params);
         return result;
     }
-    
-    async update(pars: IDBSqlParam): Promise<number> {
+
+    static async update(pars: IDBSqlParam): Promise<number> {
         return 1;
     }
 }
+
+export default DBHelper;
