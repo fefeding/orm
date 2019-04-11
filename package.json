@@ -4,7 +4,8 @@
   "description": "理财通中后台基础类库",
   "main": "./index.js",
   "scripts": {
-    "test": "tsc & node ./index.js"
+    "test": "tsc & node ./index.js",
+    "doc": "jsdoc2md **/*.js > api.md"
   },
   "types": "./index.ts",
   "repository": {

@@ -32,7 +32,7 @@ declare interface IDBParam {
  * 用sql语句查询
  */
 declare interface IDBSqlParam extends IDBParam {
-    sql: string; //查询语句
+    sql?: string; //查询语句
     //对应语句中的?参数数组
     params?: Array<string | number>;
 }
@@ -62,7 +62,7 @@ declare interface IDBWhereParam extends IDBParam {
  * 例如： {talbe: 'table1', columns: 'id, title', where: {id:1}} 表示查id=1的数据
  * 如果where为字符串，则会去用table,columns组合sql执行
  */
-declare interface IDBQueryParam extends IDBParam {       
+declare interface IDBQueryParam extends IDBSqlParam {       
 
     /**
      * 查询的列，默认为*
@@ -80,7 +80,7 @@ declare interface IDBQueryParam extends IDBParam {
      * 查询条件，可以是object或字符串。
      * 如果是字符串，则会拼到where关健词之后，并且可以通过params来指定其中的?参数值
      */
-    where: string | object;   
+    where?: string | Map<string, string|number>;   
     
     /**
      * 条件中的?对应的参数
@@ -123,10 +123,15 @@ declare interface IDBOperationParam extends IDBParam {
     uniqueKeys?: Array<string>;
 
     /**
+     * 更新数据条件
+     */
+    where?: any;
+
+    /**
      * 操作DB时，传的字段值 
      * 例如： {id: 1, name: "test"}
      */
-    data: object;
+    data: any;
 }
 
 /**
