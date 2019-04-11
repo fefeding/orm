@@ -1,7 +1,7 @@
 {
   "name": "@lct/common",
-  "version": "1.0.7",
-  "description": "理财通中后台基础类库",
+  "version": "1.0.8",
+  "description": "中后台基础类库",
   "main": "./index.js",
   "scripts": {
     "test": "tsc & node ./index.js",

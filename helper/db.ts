@@ -33,6 +33,16 @@ class DBHelper {
     }
 
     /**
+     * 执行SQL
+     * @param pars SQL和执行参数。如：{sql: 'update table set title=? where id=?', params: ['title1', 1]}
+     * @returns {IDBExecuteResult} 受影响的行数
+     */
+    static async execute(pars: IDBSqlParam): Promise<IDBExecuteResult> {
+        let ret = await pars.db.query(pars.sql, pars.params);
+        return ret;
+    }
+
+    /**
      * 执行有where并且为字符串的情况
      * @param pars 
      */
@@ -48,6 +58,14 @@ class DBHelper {
             sql += ' order by ' + ordersql;
         }
         return await pars.db.query(sql, pars.params);
+    }
+
+    /**
+     * 获取单个数据
+     * @param pars 获取单条数据接口，{table:'table1', where: {id:1}}
+     */
+    static async get(pars: IDBQueryParam): Promise<any> {
+        return await pars.db.get(pars.table, pars.where);
     }
 
     /**

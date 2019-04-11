@@ -150,3 +150,17 @@ declare interface IDBPagingResult extends IDBResult {
     count: number; //总共符合条件的数据条数
     total: number; //总共符合条件的有多少页
 }
+
+/**
+ * 执行语句返回值
+ */
+declare interface IDBExecuteResult extends IDBResult {    
+    fieldCount: number;
+    affectedRows: number;
+    insertId: number;
+    serverStatus: number;
+    warningCount: number;
+    message: string;
+    protocol41: boolean;
+    changedRows: number;     
+}
