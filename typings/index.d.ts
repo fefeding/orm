@@ -80,7 +80,7 @@ declare interface IDBQueryParam extends IDBSqlParam {
      * 查询条件，可以是object或字符串。
      * 如果是字符串，则会拼到where关健词之后，并且可以通过params来指定其中的?参数值
      */
-    where?: string | Map<string, string|number>;   
+    where?: string | Map<string, string|number> | any;   
     
     /**
      * 条件中的?对应的参数

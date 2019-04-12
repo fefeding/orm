@@ -78,7 +78,7 @@ class DBHelper {
             orders: pars.orders || [],
             columns: pars.columns || '*'
         };
-        return await pars.db.select(condition);
+        return await pars.db.select(pars.table, condition);
     }
 
     /**
