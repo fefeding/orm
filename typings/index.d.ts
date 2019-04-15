@@ -15,16 +15,16 @@ declare interface IDBParam {
      * 操作DB原生接口
      */
     db: {
-        select: function;
-        query: function;
-        update: function;
-        insert: function;
-        delete: function;
-        get: function;
-        beginTransaction: function;
-        beginTransactionScope: function;
-        commit: function;
-        rollback: function;        
+        select: Function;
+        query: Function;
+        update: Function;
+        insert: Function;
+        delete: Function;
+        get: Function;
+        beginTransaction: Function;
+        beginTransactionScope: Function;
+        commit: Function;
+        rollback: Function;        
     }
 }
 
@@ -32,7 +32,7 @@ declare interface IDBParam {
  * 用sql语句查询
  */
 declare interface IDBSqlParam extends IDBParam {
-    sql: string; //查询语句
+    sql?: string; //查询语句
     //对应语句中的?参数数组
     params?: Array<string | number>;
 }
@@ -62,7 +62,7 @@ declare interface IDBWhereParam extends IDBParam {
  * 例如： {talbe: 'table1', columns: 'id, title', where: {id:1}} 表示查id=1的数据
  * 如果where为字符串，则会去用table,columns组合sql执行
  */
-declare interface IDBQueryParam extends IDBParam {       
+declare interface IDBQueryParam extends IDBSqlParam {       
 
     /**
      * 查询的列，默认为*
@@ -80,7 +80,7 @@ declare interface IDBQueryParam extends IDBParam {
      * 查询条件，可以是object或字符串。
      * 如果是字符串，则会拼到where关健词之后，并且可以通过params来指定其中的?参数值
      */
-    where: string | object;   
+    where?: string | Map<string, string|number> | any;   
     
     /**
      * 条件中的?对应的参数
@@ -123,10 +123,15 @@ declare interface IDBOperationParam extends IDBParam {
     uniqueKeys?: Array<string>;
 
     /**
+     * 更新数据条件
+     */
+    where?: any;
+
+    /**
      * 操作DB时，传的字段值 
      * 例如： {id: 1, name: "test"}
      */
-    data: object;
+    data: any;
 }
 
 /**
@@ -144,4 +149,18 @@ declare interface IDBPagingResult extends IDBResult {
     page: number; //当前第几页
     count: number; //总共符合条件的数据条数
     total: number; //总共符合条件的有多少页
+}
+
+/**
+ * 执行语句返回值
+ */
+declare interface IDBExecuteResult extends IDBResult {    
+    fieldCount: number;
+    affectedRows: number;
+    insertId: number;
+    serverStatus: number;
+    warningCount: number;
+    message: string;
+    protocol41: boolean;
+    changedRows: number;     
 }

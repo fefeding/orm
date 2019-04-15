@@ -5,6 +5,7 @@
  * 属性跟DB中的字段规定为  加前缀F
  * 例如：属性名为firsName 会自动映射到_dbData中的Ffirst_name字段
  * 以下划线为开头的属性名不会做映射
+ * 注： 所有需要支持json序列化的，请定义时指定默认值。如： firstName: string = "";
  */
 class BaseModel {
     /**
