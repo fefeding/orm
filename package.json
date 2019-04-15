@@ -1,6 +1,6 @@
 {
   "name": "@lct/common",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "理财通中后台基础类库",
   "main": "index.js",
   "scripts": {
@@ -15,5 +15,8 @@
     "fmp"
   ],
   "author": "fefeding",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^11.13.4"
+  }
 }
