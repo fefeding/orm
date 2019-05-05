@@ -15,7 +15,7 @@
   "keywords": [
     "fmp"
   ],
-  "author": "fefeding",
+  "author": "jiamao",
   "license": "MIT",
   "dependencies": {
     "@types/node": "^11.13.4"
