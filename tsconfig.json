@@ -20,6 +20,12 @@
       "skipLibCheck": true,
       "skipDefaultLibCheck": true,
       "inlineSourceMap": true,
-      "importHelpers": true
+      "importHelpers": true,
+      "lib": [
+        "es2015",
+        "es2016",
+        "es2015.iterable",
+        "es2015.generator"
+      ]
     }
   }

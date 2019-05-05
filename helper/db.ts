@@ -1,4 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
+import BaseModel from "../model/base";
+
 /**
  * 提供DB操作基础库
  * 支持分页等功能
@@ -65,7 +67,26 @@ class DBHelper {
      * @param pars 获取单条数据接口，{table:'table1', where: {id:1}}
      */
     static async get(pars: IDBQueryParam): Promise<any> {
-        return await pars.db.get(pars.table, pars.where);
+        if(pars.db.get) {
+            return await pars.db.get(pars.table, pars.where);
+        }
+        else {
+            let columns = pars.columns || '*';
+            let sql = `SELECT ${columns} FROM ${pars.table} WHERE 1=1`;
+            let params = new Array<any>();
+            let ps = Object.getOwnPropertyNames(pars.where);
+            let obj = pars.where as Map<string, string>;
+            
+            for(let c of ps.values()) {
+                sql += ` and \`${c}\`=?`;
+                params.push(obj[c.toString()]);
+            }
+            return new Promise((resolve, reject) => {            
+                this.executeSql(pars.db, sql, params).then(result=>{
+                    resolve && resolve(result[0]);
+                }).catch(e=>reject && reject(e));
+            });
+        }
     }
 
     /**
@@ -85,7 +106,7 @@ class DBHelper {
      * 新增
      * @param pars 
      */
-    static async insert(pars: IDBOperationParam) {
+    static async insertOperation(pars: IDBOperationParam) {
         return pars.db.insert(pars.table, pars.data);
     }
 
@@ -105,6 +126,45 @@ class DBHelper {
      */
     static async delete(pars: IDBOperationParam): Promise<number> {
         return pars.db.delete(pars.table, pars.where);
+    }
+
+    /**
+     * 往DB里插入一个model对象
+     * @param db {MySql.Connection} DB连接
+     * @param table {string} 表名
+     * @param data {BaseModel} 新增的数据model
+     * @returns {fieldCount: 0,affectedRows: 1,insertId: 6,serverStatus: 2,warningCount: 0,message: '',protocol41: true,changedRows: 0 }
+     */
+    static async insert(db: any, data: BaseModel, table: string = ""): Promise<any> {   
+        //如果是IDBOperationParam，则调用eggjs相关接口
+        if(db && db.db) {
+            return this.insertOperation(db);
+        }   
+        table = table || data._tableName;
+        let sql = `INSERT INTO ${table} SET ?`;
+        return this.executeSql(db, sql, data._dbData);
+    }
+
+    /**
+     * 
+     * @param db DB连接
+     * @param sql 要执行的SQL 例如sql="select * from id=?"
+     * @param params SQL中的参数，例如[1]
+     */
+    static async executeSql(db: any, sql: string, params: any=[]) {
+        return new Promise((resolve, reject) => {
+            
+            let qry = db.query(sql, params, (err, results)=>{                
+                if(err) {
+                    if(reject) reject(err);
+                    else throw err;
+                }
+                else {
+                    resolve && resolve(results);
+                }
+            });
+            qry && qry.sql && console.log(qry.sql);
+        });
     }
 }
 
