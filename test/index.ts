@@ -52,7 +52,7 @@ dbHelper.insert(connection, m, tablename).then(result=>{
 async function get(id: number) {
     let result = await dbHelper.get({
         db: connection,
-        table: m._tableName,
+        table: tablename,
         where: {
             Fid: id
         }
