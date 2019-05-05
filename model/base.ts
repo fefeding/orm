@@ -96,7 +96,7 @@ class BaseModel {
                 if(typeof key == 'string' && !key.startsWith('_')) {
                     let pros = target.getPropertyNames();
                     if(pros.includes(key)) {
-                        target.setValue(key, value);
+                        target.setValue(key, value, receiver);
                         return true;
                     }
                 }
@@ -110,7 +110,8 @@ class BaseModel {
       * @method getValue
       * @param {string} name 属性名，也可以是在DB中的字段名
       */
-     public getValue(name: string): string {
+     public getValue(name: string): any {
+        if(!this._dbData) return null;
         let field = this.getFieldName(name);
         return this._dbData[field];
      }
@@ -120,9 +121,14 @@ class BaseModel {
       * @param {string} name 属性名 
       * @param {any} value 设置值
       */
-     public setValue(name: string, value: any): void {
-        let field = this.getFieldName(name);
-        this._dbData[field] = value;
+     public setValue(name: string, value: any, receiver?: any): void {
+        if(this._dbData) {
+            let field = this.getFieldName(name);
+            this._dbData[field] = value;
+        }
+        else {
+            Reflect.set(this, name, value, receiver);
+        }
      }
 
      /**

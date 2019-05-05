@@ -86,7 +86,17 @@ declare interface IDBQueryParam extends IDBSqlParam {
      * 条件中的?对应的参数
      * 只有where为字符串，且条件中有?变量时才有意义
      */
-    params?: Array<string | number>;    
+    params?: Array<string | number>;
+    
+    /**
+     * 查询条数
+     */
+    limit?: number;
+
+    /**
+     * 查询起始索引
+     */
+    index?: number;
 }
 
 /**

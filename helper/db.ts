@@ -21,15 +21,15 @@ class DBHelper {
         };
         pars.columns = pars.columns || '*';
         if(pars.sql) {
-            result.data = await pars.db.query(pars.sql, pars.params);
+            result.data = await this.execute(pars);
         }
         //where为字符串的情况，则拼sql来执行
         else if(pars.where && typeof pars.where == 'string') {            
-            result.data = this.queryStringWhere(pars);
+            result.data = await this.queryStringWhere(pars);
         }
-        //where为ob ject情况，直接select
+        //where为object情况，直接select
         else if(pars.where && typeof pars.where == 'object') {
-            result.data = this.select(pars);
+            result.data = await this.select(pars);
         }
         return result;
     }
@@ -37,11 +37,10 @@ class DBHelper {
     /**
      * 执行SQL
      * @param pars SQL和执行参数。如：{sql: 'update table set title=? where id=?', params: ['title1', 1]}
-     * @returns {IDBExecuteResult} 受影响的行数
+     * @returns {any} 受影响的行数
      */
-    static async execute(pars: IDBSqlParam): Promise<IDBExecuteResult> {
-        let ret = await pars.db.query(pars.sql, pars.params);
-        return ret;
+    static async execute(pars: IDBSqlParam): Promise<any> {
+        return this.executeSql(pars.db, pars.sql || '', pars.params);
     }
 
     /**
@@ -59,7 +58,16 @@ class DBHelper {
             });
             sql += ' order by ' + ordersql;
         }
-        return await pars.db.query(sql, pars.params);
+        //如果有条数限制
+        if(pars.limit) {
+            if(pars.index) {
+                sql += ` limit ${pars.index},${pars.limit}`;
+            }
+            else {
+                sql += ` limit ${pars.limit}`;
+            }
+        }
+        return this.executeSql(pars.db, sql, pars.params);
     }
 
     /**
