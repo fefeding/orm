@@ -22,6 +22,7 @@ class DBHelper {
             data: new Array<any>()
         };
         pars.columns = pars.columns || '*';
+        if(type && !pars.table) pars.table = type._tableName;
         if(pars.sql) {
             result.data = await this.execute(pars);
         }
@@ -67,8 +68,8 @@ class DBHelper {
         }
         //如果有条数限制
         if(pars.limit) {
-            if(pars.index) {
-                sql += ` limit ${pars.index},${pars.limit}`;
+            if(pars.offset) {
+                sql += ` limit ${pars.offset},${pars.limit}`;
             }
             else {
                 sql += ` limit ${pars.limit}`;
@@ -82,31 +83,34 @@ class DBHelper {
      * @param pars 获取单条数据接口，{table:'table1', where: {id:1}}
      */
     static async get(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<any> {
+        if(type && !pars.table) pars.table = type._tableName;
         if(pars.db.get) {
-            return await pars.db.get(pars.table, pars.where);
+            let data = await pars.db.get(pars.table, pars.where);
+            if(type) data = new type(data);
+            return data;
         }
         else {
             let columns = pars.columns || '*';
             let sql = `SELECT ${columns} FROM ${pars.table} WHERE 1=1`;
             let params = new Array<any>();
-            let ps = Object.getOwnPropertyNames(pars.where);
+            let ps = modelHelper.getPropertyNames(pars.where);
             let obj = pars.where as Map<string, any>;
             
-            for(let c of ps.values()) {
-                sql += ` and \`${c}\`=?`;
-                params.push(obj[c.toString()]);
+            for(let i=0; i<ps.length; i++) {
+                sql += ` and \`${ps[i]}\`=?`;
+                params.push(obj[ps[i]]);
             }
-            return new Promise((resolve, reject) => {            
-                this.executeSql(pars.db, sql, params).then(result=>{
-                    resolve && resolve(result[0]);
-                }).catch(e=>reject && reject(e));
-            });
+                    
+            let data = await this.executeSql(pars.db, sql, params);
+            if(data && data.length) {
+                data = type? new type(data[0]): data[0];
+            }
+            return data;
         }
     }
 
     /**
      * 当where为object时，采用select直接查
-     * 不支持limit查询
      * @param pars select参数，where为object情况
      */
     static async select(pars: IDBQueryParam): Promise<any> {
@@ -115,7 +119,9 @@ class DBHelper {
             let condition = {
                 where: pars.where,
                 orders: pars.orders || [],
-                columns: pars.columns || '*'
+                columns: pars.columns || '*',
+                limit: pars.limit,
+                offset: pars.offset
             };
             return await pars.db.select(pars.table, condition);
         }
@@ -126,16 +132,20 @@ class DBHelper {
                 let ps = Object.getOwnPropertyNames(pars.where);
                 let obj = pars.where as Map<string, any>;
                 
-                for(let c of ps.values()) {
-                    strWhere += ` and \`${c}\`=?`;
-                    params.push(obj[c.toString()]);
+                for(let i=0; i<ps.length; i++) {
+                    strWhere += ` and \`${ps[i]}\`=?`;
+                    params.push(obj[ps[i]]);
                 }
             }
             return await this.queryStringWhere({
                 db: pars.db,
+                table: pars.table,
                 where: strWhere,
+                params: params,
                 orders: pars.orders || [],
-                columns: pars.columns || '*'
+                columns: pars.columns || '*',
+                limit: pars.limit,
+                offset: pars.offset
             });
         }
     }

@@ -96,7 +96,7 @@ declare interface IDBQueryParam extends IDBSqlParam {
     /**
      * 查询起始索引
      */
-    index?: number;
+    offset?: number;
 }
 
 /**

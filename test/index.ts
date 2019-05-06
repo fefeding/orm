@@ -35,7 +35,7 @@ console.log(Object.getPrototypeOf(user));
 const connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : '1234',
+    password : 'df123456',
     database : 'test',
     charset  : 'utf8'
   });
@@ -75,6 +75,7 @@ describe('测试DBHelper', ()=>{
     });
 
     it('查询单个user', async ()=>{
+        
         let result = await DBHelper.get({
             db: connection,
             table: tablename,
@@ -82,7 +83,7 @@ describe('测试DBHelper', ()=>{
                 Fid: newid
             }
         });
-
+        
         let m2 = new MyModel(result);
         //console.log('转为MyModel', m2.toJSON());
 
@@ -112,17 +113,18 @@ describe('测试DBHelper', ()=>{
         assert.equal(ret2.affectedRows, 1, 'executeSql');
     });
 
-    it('sql查询', async ()=>{
+    it('sql查询[query]', async ()=>{
+        //sql带参数的直接执行方式
         let data = await DBHelper.query({
             db: connection,
             sql: `select * from ${tablename} where Fname like ? limit 2`,
             params: ['%name%']
         }, MyModel);
         //console.log(JSON.stringify(data));
-        assert.ok(data.data.length > 0);
+        assert.ok(data.data.length > 0, 'sql查询');
     });
 
-    it('单独where条件，并设定起始条数的 查询', async ()=>{
+    it('where为字符串，并设定起始条数的 查询', async ()=>{
         //where 查询
         let data = await DBHelper.query({
             db: connection,
@@ -131,7 +133,23 @@ describe('测试DBHelper', ()=>{
             where: `Fname like ?`,
             params: ['%name%'],
             orders: [['Fcreate_time', 'desc'], ['Fnick_name', 'desc']],
-            index: 2, //起始
+            offset: 2, //起始
+            limit: 3    //条数
+        }, MyModel);
+        assert.ok(data.data.length > 0);
+    });
+
+    it('where为object，并设定起始条数的 查询', async ()=>{
+        //where 查询
+        let data = await DBHelper.query({
+            db: connection,
+            columns: '*',
+            table: tablename,
+            where: {
+                Fid: newid
+            },
+            orders: [['Fcreate_time', 'desc'], ['Fnick_name', 'desc']],
+            offset: 0, //起始
             limit: 3    //条数
         }, MyModel);
         assert.ok(data.data.length > 0);

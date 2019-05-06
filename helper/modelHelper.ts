@@ -46,6 +46,16 @@ class modelHelper {
      }
 
      /**
+      * 获取model类型中属性对应的表字段名
+      * @param name model中的属性名
+      * @param type model的class类
+      */
+     static getFieldName(name: string, type: { new();}): string {
+        let instance = new type();
+        return instance.getFieldName(name);
+     }
+
+     /**
       * 转为json
       * @method toJSON
       * @param target {class} 需要转为json的实例

@@ -4,6 +4,7 @@
   "description": "中后台基础类库",
   "main": "./index.js",
   "scripts": {
+    "init": "npm install -g mocha",
     "test": "cd test & tsc & mocha ./index & cd ..",
     "doc": "jsdoc2md **/*.ts > api.md"
   },
