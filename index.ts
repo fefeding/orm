@@ -1,7 +1,15 @@
 /// <reference path="./typings/index.d.ts" />
 
-import base from "./model/base";
-import db from "./helper/db";
+import model from "./model/base";
+import dbhelper from "./helper/db";
+import modelhelper from "./helper/modelHelper";
 
-export const BaseModel = base;
-export const DBHelper = db;
+export const BaseModel = model;
+export const DBHelper = dbhelper;
+export const ModelHelper = modelhelper;
+
+export default {
+    BaseModel,
+    DBHelper,
+    ModelHelper
+};

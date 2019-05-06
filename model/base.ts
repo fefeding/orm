@@ -1,6 +1,9 @@
-const PrimaryKeyId = Symbol("model primary key id");
-const TableNameId = Symbol("model table name key id");
-const TableFieldMapId = Symbol("model table field map id");
+
+import modelHelper from "../helper/modelHelper";
+
+const PrimaryKeyId = Symbol("$primaryKeys");
+const TableNameId = Symbol("$tableName");
+const TableFieldMapId = Symbol("$tableFieldMap");
 
 /**
  * 数据model的基础类
@@ -11,52 +14,7 @@ const TableFieldMapId = Symbol("model table field map id");
  * 注： 所有需要支持json序列化的，请定义时指定默认值。如： firstName: string = "";
  */
 class BaseModel {    
-
     /**
-     * DB原始数据对象
-     * @property _dbData
-     * @type Object
-     */
-    public _dbData: object; 
-
-    /**
-     * 当前对应表的唯一健
-     * @property _primaryKeys
-     * @type Array<string>
-     */
-    public get _primaryKeys(): Array<string> {
-        return this[PrimaryKeyId];
-    }
-    public set _primaryKeys(value: Array<string>) {
-        this[PrimaryKeyId] = value;
-    }
-
-    /**
-     * 对应的表名
-     * @property _tableName
-     * @type string
-     */
-    public get _tableName(): string {
-        return this[TableNameId];
-    }
-    public set _tableName(value: string) {
-        this[TableNameId] = value;
-    }
-
-    /**
-     * 表字段跟对象属性的映射
-     * 格式：{property: field}
-     * @property _fieldMap
-     * @type Map
-     */
-    public get _fieldMap(): object {
-        return this[TableFieldMapId];
-    }
-    public set _fieldMap(value: object) {
-        this[TableFieldMapId] = value;
-    }
-
-     /**
       * 根据参数实例化当前类
       * @param {Object/String} data 如果传入object会当做DB表数据来映射，如果是model对象，则进行浅拷贝。如果是字符串只进行json转换
       * @param {Object} map 字段跟属性的映射，一般不需要指定，除非需要特殊  格式：{property: field}
@@ -79,12 +37,12 @@ class BaseModel {
             }            
         }        
         this._fieldMap = Object.assign(this._fieldMap||{}, map);
-
+        
         //所有model采用代理方法，从DB中取值
         return new Proxy<BaseModel>(this, {
             get: function (target, key, receiver) {                
-                if(typeof key == 'string' && !key.startsWith('_')) {
-                    let pros = target.getPropertyNames();
+                if(typeof key == 'string' && !key.startsWith('_') && !key.startsWith('$')) {
+                    let pros = modelHelper.getPropertyNames(target);
                     if(pros.includes(key)) {
                         let v = target.getValue(key);
                         if(typeof v != 'undefined') return v;
@@ -93,8 +51,8 @@ class BaseModel {
                 return Reflect.get(target, key, receiver);
             },
             set: function (target, key, value, receiver) {                
-                if(typeof key == 'string' && !key.startsWith('_')) {
-                    let pros = target.getPropertyNames();
+                if(typeof key == 'string' && !key.startsWith('_') && !key.startsWith('$')) {
+                    let pros = modelHelper.getPropertyNames(target);
                     if(pros.includes(key)) {
                         target.setValue(key, value, receiver);
                         return true;
@@ -104,6 +62,92 @@ class BaseModel {
             }
           });
      } 
+
+    /**
+     * DB原始数据对象
+     * @property _dbData
+     * @type Object
+     */
+    public _dbData: object; 
+
+    /**
+     * 当前对应表的唯一健
+     * @property _primaryKeys
+     * @type Array<string>
+     */
+    public get _primaryKeys(): Array<string> {
+        let proto = Object.getPrototypeOf(this);
+        return proto[PrimaryKeyId];
+    }
+    public set _primaryKeys(value: Array<string>) {
+        let proto = Object.getPrototypeOf(this);
+        proto[PrimaryKeyId] = value;
+    }
+    /**
+     * 当前对应表的唯一健
+     * @static
+     * @property _primaryKeys
+     * @type Array<string>
+     */
+    public static get _primaryKeys(): Array<string> {
+        return this.prototype[PrimaryKeyId];
+    }
+    public static set _primaryKeys(value) {
+        this.prototype[PrimaryKeyId] = value;
+    }
+
+    /**
+     * 对应的表名
+     * @property _tableName
+     * @type string
+     */
+    public get _tableName(): string {
+        let proto = Object.getPrototypeOf(this);
+        return proto[TableNameId];
+    }
+    public set _tableName(value: string) {
+        let proto = Object.getPrototypeOf(this);
+        proto[TableNameId] = value;
+    }
+    /**
+     * 对应的表名
+     * @static
+     * @property tableName
+     * @type string
+     */
+    public static get _tableName(): string {
+        return this.prototype[TableNameId];
+    }
+    public static set _tableName(value) {
+        this.prototype[TableNameId] = value;
+    }
+
+    /**
+     * 表字段跟对象属性的映射
+     * 格式：{property: field}
+     * @property _fieldMap
+     * @type Map
+     */
+    public get _fieldMap(): object {
+        let proto = Object.getPrototypeOf(this);
+        return proto[TableFieldMapId];
+    }
+    public set _fieldMap(value: object) {
+        let proto = Object.getPrototypeOf(this);
+        proto[TableFieldMapId] = value;
+    }
+    /**
+     * 表字段跟对象属性的映射
+     * 格式：{property: field}
+     * @property _fieldMap
+     * @type Map
+     */
+    public static get _fieldMap(): object {
+        return this.prototype[TableFieldMapId];
+    }
+    public static set _fieldMap(value: object) {
+        this.prototype[TableFieldMapId] = value;
+    }     
 
      /**
       * 从DB数据源中读取属性值
@@ -153,43 +197,7 @@ class BaseModel {
          }
         
          return field;
-     }
-
-     /**
-      * 把原始数据组转为当前model数组
-      * @param {Array} data 原始数据数组
-      * @static
-      * @returns {Array<Model>}
-      */
-     static toArray(data: Array<object|string|BaseModel>): Array<any> {
-        if(!data || !data.length) return [];
-        
-        return Array.from(data, d => new this(d));
-     }
-     
-     /**
-      * 获取所有属性名，包括子和父类
-      */
-     getPropertyNames(): Array<string> {
-        let proto = Object.getPrototypeOf(this);
-        let names = Object.getOwnPropertyNames(this);
-        while(proto) {
-            let tmp = Object.getOwnPropertyNames(proto);
-            //过滤掉不可读和函数属性
-            tmp.forEach(k => {
-                let desc = Object.getOwnPropertyDescriptor(proto, k);
-                let hasGetter = desc && typeof desc.get === 'function';
-                if(hasGetter && names.indexOf(k) === -1) {                    
-                    names.push(k);
-                }
-            });
-            //如果已到基类 BaseModel 则不再往上找
-            if(proto.constructor == BaseModel) break;
-            proto = proto.__proto__;            
-        }
-
-        return names;
-     }
+     }    
 
      /**
       * 转为json
@@ -197,11 +205,7 @@ class BaseModel {
       * @returns object
       */
      public toJSON(): object {
-        let jsonObj = {};         
-        let pros = this.getPropertyNames(); 
-        for (let key of pros) {
-            jsonObj[key] = this[key];
-        }
+        let jsonObj = modelHelper.toJSON(this, (k: string) => !k.startsWith('$')); 
         return jsonObj;
      }
 

@@ -1,5 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 import BaseModel from "../model/base";
+import modelHelper from "./modelHelper";
 
 /**
  * 提供DB操作基础库
@@ -15,9 +16,9 @@ class DBHelper {
      * 3. 如果where为object， 则会直接调用db的select
      * @returns {IDBResult}
      */
-    static async query(pars: IDBQueryParam): Promise<IDBResult> {
+    static async query(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<IDBResult> {
         let result = {
-            data: {}
+            data: new Array<any>()
         };
         pars.columns = pars.columns || '*';
         if(pars.sql) {
@@ -30,6 +31,11 @@ class DBHelper {
         //where为object情况，直接select
         else if(pars.where && typeof pars.where == 'object') {
             result.data = await this.select(pars);
+        }
+
+        //如果指定了需要的类型，则先转换
+        if(result.data && result.data.length && type) {
+            result.data = modelHelper.toArray(result.data, type);
         }
         return result;
     }
@@ -159,7 +165,7 @@ class DBHelper {
      * @param sql 要执行的SQL 例如sql="select * from id=?"
      * @param params SQL中的参数，例如[1]
      */
-    static async executeSql(db: any, sql: string, params: any=[]) {
+    static async executeSql(db: any, sql: string, params: any=[]): Promise<any> {
         return new Promise((resolve, reject) => {
             
             let qry = db.query(sql, params, (err, results)=>{                

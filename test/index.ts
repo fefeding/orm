@@ -1,7 +1,9 @@
 
 import * as mysql from "mysql";
-import BaseModel from "../model/base";
-import dbHelper from "../helper/db";
+
+import { BaseModel, DBHelper } from "../index";
+
+import * as assert from "assert";
 
 let tablename = 't_user';
 let primarykeys = ['id'];
@@ -15,13 +17,21 @@ class MyModel extends BaseModel {
     createTime: string = "";
 }
 
-console.log(MyModel);
+@BaseModel.Table('t_user2', primarykeys) //关联表t_user, 且主健为id,  非必须，各接口可以手动传入
+class MyModel2 extends BaseModel {  
+    @BaseModel.TableField('Fid2') //映射属性跟字段, 非必须。如果不指定，则默认会在前加上F，并把大写字母转为_加小写来映射
+    id: number = 0;
+    name: string = "";
+    nickName: string = "";
+    createTime: string = "";
+}
+console.log(MyModel.prototype);
+console.log(MyModel2.prototype);
 
-let m = new MyModel();
-m.name = "my name";
-m.nickName = "my";
-console.log(m.toString());
+let user = new MyModel2();
+console.log(Object.getPrototypeOf(user));
 
+//本地测试数据库
 const connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
@@ -30,35 +40,91 @@ const connection = mysql.createConnection({
     charset  : 'utf8'
   });
 
-  connection.connect();
-  startTest();
 
-  //开始测试
-  async function startTest() {
-    try {
-        let ret1 = await dbHelper.insert(connection, m, tablename); 
-        console.log('新增一条记录', ret1);
+describe('测试DBHelper', ()=>{
+    before(()=>{
+        connection.connect();
+        // 在执行所有的测试用例前 函数会被调用一次
+    });
 
-        let data = await get(ret1.insertId);
-        console.log('查询当前新增的记录', data);
+    after(function() {
+        // 在执行完所有的测试用例后 函数会被调用一次        
+        connection.end();
+        console.log('测试结束');
+    });
+    
+    beforeEach(function() {
+        // 在执行每个测试用例前 函数会被调用一次
+    });
+    
+    afterEach(function() {
+        // 在执行每个测试用例后 函数会被调用一次
+    });
 
-        let m2 = new MyModel(data);
-        console.log('转为MyModel', m2.toJSON());
+    var newid = 0;
+    it('新增一个user', async ()=>{
+        let m = new MyModel();
+        m.name = "my name";
+        m.nickName = "my";
+        console.log(m.toString());
 
-        let ret2 = await execute(m2.id);
-        console.log('执行修改', ret2);
+        let ret1 = await DBHelper.insert(connection, m, tablename); 
+        assert.ok(ret1.insertId > 0);
 
-        //查询
-        //sql查询
-        let data1 = await dbHelper.query({
+        newid = ret1.insertId;        
+    });
+
+    it('查询单个user', async ()=>{
+        let result = await DBHelper.get({
+            db: connection,
+            table: tablename,
+            where: {
+                Fid: newid
+            }
+        });
+
+        let m2 = new MyModel(result);
+        //console.log('转为MyModel', m2.toJSON());
+
+        assert.ok(!!result);
+        assert.equal(m2.id, newid, m2.toString());
+    });
+
+    it('执行修改 execute', async ()=>{
+
+        let sql = `update ${tablename} set Fname=? where Fid=?`;
+        let ret1 = await DBHelper.execute({
+            db: connection,
+            sql: sql,
+            params: ['new name', newid]
+        });
+        assert.equal(ret1.affectedRows, 1, 'execute');
+        //测试executeSql
+        let ret2 = await DBHelper.executeSql(connection, sql, ['new name2', newid]);
+        assert.equal(ret2.affectedRows, 1, 'executeSql');
+    });
+
+    it('执行修改 executeSql', async ()=>{
+
+        let sql = `update ${tablename} set Fname=? where Fid=?`;       
+        //测试executeSql
+        let ret2 = await DBHelper.executeSql(connection, sql, ['new name2', newid]);
+        assert.equal(ret2.affectedRows, 1, 'executeSql');
+    });
+
+    it('sql查询', async ()=>{
+        let data = await DBHelper.query({
             db: connection,
             sql: `select * from ${tablename} where Fname like ? limit 2`,
             params: ['%name%']
-        });
-        console.log('sql查询', data1);
+        }, MyModel);
+        //console.log(JSON.stringify(data));
+        assert.ok(data.data.length > 0);
+    });
 
+    it('where 字符串 查询', async ()=>{
         //where 查询
-        let data2 = await dbHelper.query({
+        let data = await DBHelper.query({
             db: connection,
             columns: '*',
             table: tablename,
@@ -67,51 +133,7 @@ const connection = mysql.createConnection({
             orders: [['Fcreate_time', 'desc'], ['Fnick_name', 'desc']],
             index: 2, //起始
             limit: 3    //条数
-        });
-        console.log('where 查询', data2);
-    }
-    catch(e) {
-        console.log(e);
-    }
-
-    connection.end();
-
-    console.log('测试结束');
-
-}
-
-//查询单条记录
-async function get(id: number) {
-    let result = await dbHelper.get({
-        db: connection,
-        table: tablename,
-        where: {
-            Fid: id
-        }
+        }, MyModel);
+        assert.ok(data.data.length > 0);
     });
-
-    return result;
-}
-//执行sql测试, execute/executeSql 
-//把指定的id修改新名称
-async function execute(id: number) {
-    return new Promise(resolve => {
-        let sql = `update ${tablename} set Fname=? where Fid=?`;
-
-        dbHelper.execute({
-            db: connection,
-            sql: sql,
-            params: ['new name', id]
-        }).then(ret1=>{
-            console.log(ret1);
-            //测试executeSql
-            dbHelper.executeSql(connection, sql, ['new name2', id]).then(ret2 => {
-                resolve && resolve(ret2);
-            });
-        });
-    });
-    
-}
-
-//connection.end();
-
+});
