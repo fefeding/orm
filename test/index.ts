@@ -122,7 +122,7 @@ describe('测试DBHelper', ()=>{
         assert.ok(data.data.length > 0);
     });
 
-    it('where 字符串 查询', async ()=>{
+    it('单独where条件，并设定起始条数的 查询', async ()=>{
         //where 查询
         let data = await DBHelper.query({
             db: connection,

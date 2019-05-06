@@ -44,7 +44,7 @@ class BaseModel {
                 if(typeof key == 'string' && !key.startsWith('_') && !key.startsWith('$')) {
                     let pros = modelHelper.getPropertyNames(target);
                     if(pros.includes(key)) {
-                        let v = target.getValue(key);
+                        let v = target.getValue(key, receiver);
                         if(typeof v != 'undefined') return v;
                     }
                 }
@@ -154,10 +154,13 @@ class BaseModel {
       * @method getValue
       * @param {string} name 属性名，也可以是在DB中的字段名
       */
-     public getValue(name: string): any {
+     public getValue(name: string, receiver?: any): any {
         if(!this._dbData) return null;
         let field = this.getFieldName(name);
-        return this._dbData[field];
+        if(field) return this._dbData[field];
+        else {
+            return Reflect.get(this, name, receiver);
+        }
      }
      /**
       * 把数据写到DB原对象中
@@ -178,11 +181,12 @@ class BaseModel {
      /**
       * 根据属性名得到对应的表字段名，这里规定死为属性名前加一个F为字段名
       * 并把大写字母转为_小写
+      * 如果传入了_或$开头的名称，则返回空
       * @method getFieldName
       * @param {String} name 属性名
       */
      public getFieldName(name: string): string {
-         
+        if(name.startsWith('_') || name.startsWith('$')) return "";
          //映射是 field: property
          //如果从映射中找到，则直接返回即可         
          if(this._fieldMap[name]) return this._fieldMap[name];
