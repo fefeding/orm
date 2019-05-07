@@ -173,6 +173,8 @@ class DBHelper {
      * 更新数据
      * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
      * @param pars {BaseModel|IDBOperationParam} 需要更新model对象，或操作指定
+     * @param table {String}[optinal] 表名，如果不指定则从pars中读
+     * @param db {any}[optional] 当前DB连接，不指定则用当前实例DB
      */
     async update(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult> {
         
@@ -197,7 +199,7 @@ class DBHelper {
             }
             if(sql.endsWith(',')) sql = sql.replace(/,$/, '');
             //组合更新条件
-            let where = modelHelper.createSqlWhere(primaryWhere);
+            let where = modelHelper.createSqlWhere(primaryWhere, pars instanceof BaseModel? pars: undefined);
             if(where.where) {
                 sql += ' WHERE ' + where.where;
                 params = params.concat(where.params);
@@ -209,11 +211,34 @@ class DBHelper {
     /**
      * 删除数据
      * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
-     * @param pars 
+     * @param pars {BaseModel|IDBOperationParam} 需要更新model对象，或操作指定
+     * @param table {String}[optinal] 表名，如果不指定则从pars中读
+     * @param db {any}[optional] 当前DB连接，不指定则用当前实例DB
      */
-    async delete(pars: IDBOperationParam): Promise<number> {
-        pars.db = pars.db || this.db;
-        return pars.db.delete(pars.table, pars.where);
+    async delete(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult> {
+        db = (pars instanceof BaseModel? db: pars.db) || this.db;
+        table = table || (pars instanceof BaseModel? pars._tableName: pars.table);
+        
+        //生成删除主健
+        let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
+        if(db.delete) {
+            return db.delete(table, primaryWhere);
+        }
+        else {
+            let sql = `DELETE FROM ${table}`;                
+            let params = new Array<any>();
+
+            //组合更新条件
+            let where = modelHelper.createSqlWhere(primaryWhere, pars instanceof BaseModel? pars: undefined);
+            if(where.where) {
+                sql += ' WHERE ' + where.where;
+                params = params.concat(where.params);
+            }
+            else {
+                throw "未指定删除条件";
+            }
+            return await this.executeSql(sql, params, db);
+        }
     }
 
     /**

@@ -60,17 +60,16 @@ class modelHelper {
         if(name.startsWith('_') || name.startsWith('$')) return "";
          //映射是 field: property
          //如果从映射中找到，则直接返回即可         
-         if(type._fieldMap[name]) return type._fieldMap[name];
-         let field = '';
+         if(type && type._fieldMap && type._fieldMap[name]) return type._fieldMap[name];
+         let field = name;
          //当不是以F开头时，认为属性名，则需要转为字段名
          if(!/^F/.test(name)) {
              //把类似于 firstName 这种命名转为 first_name
             field = name.replace(/([A-Z])/g, p => '_' + p.toLowerCase());
             field = 'F' + field;
 
-            type._fieldMap[name] = field; //缓存映射
-         }
-        
+            type && type._fieldMap && (type._fieldMap[name] = field); //缓存映射
+         }        
          return field;
      }
 
@@ -112,8 +111,9 @@ class modelHelper {
              params: new Array<any>()
          };
       * @param obj sql条件参数
+      * @param type {model class} 指定类型，如果不指定则字段按属性名，指定了就会去取映射的字段名
       */
-     static createSqlWhere(obj: object): {where: string, params: Array<any>} {
+     static createSqlWhere(obj: object, type?: { new(): BaseModel, _fieldMap: object;}|BaseModel): {where: string, params: Array<any>} {
          let result = {
              where: "",
              params: new Array<any>()
@@ -122,7 +122,8 @@ class modelHelper {
          let ps = this.getPropertyNames(obj);    
          //组合更新条件     
         for(let i=0; i<ps.length; i++) {
-            result.where += `\`${ps[i]}\`=? and `;
+            let c = type? this.getFieldName(ps[i], type): ps[i];
+            result.where += `\`${c}\`=? and `;
             result.params.push(obj[ps[i]]);
         }
         if(result.where.endsWith(' and ')) result.where = result.where.replace(/\s*and\s*$/, '');

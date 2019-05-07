@@ -1,7 +1,7 @@
 /// <reference path="./typings/index.d.ts" />
 
 import model from "./model/base";
-import dbhelper from "./helper/db";
+import dbhelper from "./helper/dbHelper";
 import modelhelper from "./helper/modelHelper";
 
 export const BaseModel = model;

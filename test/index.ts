@@ -121,7 +121,6 @@ describe('测试DBHelper', ()=>{
         let m = new MyModel();
         m.id = newid;
         m.nickName = "update name";   
-        //测试executeSql
         let ret = await db.update(m);
         assert.equal(ret.affectedRows, 1, 'executeSql');
     });
@@ -163,5 +162,11 @@ describe('测试DBHelper', ()=>{
             limit: 3    //条数
         }, MyModel);
         assert.ok(data.data.length > 0);
+    });
+
+    it('删除', async ()=>{        
+        let ret = await db.delete(newmodel);
+        console.log(ret);
+        assert.equal(ret.affectedRows, 1, 'delete');
     });
 });
