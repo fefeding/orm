@@ -176,6 +176,107 @@ declare interface IDBExecuteResult extends IDBResult {
 }
 
 /**
+ * 数据model的基础类
+ * 构造函数可以接受DB查出的result
+ * 属性跟DB中的字段规定为  加前缀F
+ * 例如：属性名为firsName 会自动映射到_dbData中的Ffirst_name字段
+ * 以下划线为开头的属性名不会做映射
+ * 注： 所有需要支持json序列化的，请定义时指定默认值。如： firstName: string = "";
+ */
+declare interface IBaseModel {
+
+    /**
+     * DB原始数据对象
+     * @property _dbData
+     * @type Object
+     */
+    _dbData: object; 
+
+    /**
+     * 当前对应表的唯一健
+     * @property _primaryKeys
+     * @type Array<string>
+     */
+    _primaryKeys: Array<string>;
+
+    /**
+     * 当前对应表的唯一健
+     * @static
+     * @property _primaryKeys
+     * @type Array<string>
+     */
+    static _primaryKeys: Array<string>;
+
+    /**
+     * 对应的表名
+     * @property _tableName
+     * @type string
+     */
+    _tableName: string;
+    /**
+     * 对应的表名
+     * @static
+     * @property tableName
+     * @type string
+     */
+    static _tableName: string;
+
+    /**
+     * 表字段跟对象属性的映射
+     * 格式：{property: field}
+     * @property _fieldMap
+     * @type Map
+     */
+    _fieldMap: object;
+
+    /**
+     * 表字段跟对象属性的映射
+     * 格式：{property: field}
+     * @property _fieldMap
+     * @type Map
+     */
+    static _fieldMap: object;
+
+     /**
+      * 从DB数据源中读取属性值
+      * @method getValue
+      * @param {string} name 属性名，也可以是在DB中的字段名
+      */
+     getValue(name: string, receiver?: any): any;
+
+     /**
+      * 把数据写到DB原对象中
+      * @method getValue
+      * @param {string} name 属性名 
+      * @param {any} value 设置值
+      */
+     setValue(name: string, value: any, receiver?: any): void;
+
+     /**
+      * 根据属性名得到对应的表字段名，这里规定死为属性名前加一个F为字段名
+      * 并把大写字母转为_小写
+      * 如果传入了_或$开头的名称，则返回空
+      * @method getFieldName
+      * @param {String} name 属性名
+      */
+     getFieldName(name: string): string;
+
+     /**
+      * 转为json
+      * @method toJSON
+      * @returns object
+      */
+     toJSON(): object;
+
+     /**
+      * 转为json串
+      * @method toString
+      * @returns string
+      */
+     toString(): string;
+ }
+
+/**
  * 提供DB操作基础库
  * 支持分页等功能
  */

@@ -13,7 +13,7 @@ const TableFieldMapId = Symbol("$tableFieldMap");
  * 以下划线为开头的属性名不会做映射
  * 注： 所有需要支持json序列化的，请定义时指定默认值。如： firstName: string = "";
  */
-class BaseModel {    
+class BaseModel implements IBaseModel {    
     /**
       * 根据参数实例化当前类
       * @param {Object/String} data 如果传入object会当做DB表数据来映射，如果是model对象，则进行浅拷贝。如果是字符串只进行json转换
