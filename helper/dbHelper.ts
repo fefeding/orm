@@ -9,7 +9,7 @@ import modelHelper from "./modelHelper";
 class DBHelper implements IDBHelper {
     /**
      * 生成DB实例
-     * @param db DB操作对象，mysql的connection或 eggjs的
+     * @param {Mysql} db DB操作对象，mysql的connection或 eggjs的
      */
     constructor(db: any = null) {
         if(db && db instanceof DBHelper) db = db.db;
@@ -21,6 +21,17 @@ class DBHelper implements IDBHelper {
      * 可以是原生的mysql连接，或eggjs的
      */
     public db: any;
+
+    /**
+     * 给对象混入db操作实例接口
+     * @param {class|object} target 需要混入DBHelper的实例
+     */
+    public static apply(target: any) {
+        Object.getOwnPropertyNames(this.prototype).forEach(name => {
+            if(target.prototype) target.prototype[name] = this.prototype[name];
+            else target[name] = this.prototype[name];
+        });
+    }
 
     /**
      * 使用query，可用来查询或SQL执行
