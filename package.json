@@ -1,7 +1,7 @@
 {
-  "name": "@lct/common",
+  "name": "@lct/orm",
   "version": "1.0.14",
-  "description": "中后台基础类库",
+  "description": "ORM规范",
   "main": "./index.js",
   "scripts": {
     "init": "npm install -g mocha",
