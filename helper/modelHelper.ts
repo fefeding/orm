@@ -110,8 +110,8 @@ class modelHelper {
              where: "",
              params: new Array<any>()
          };
-      * @param obj sql条件参数
-      * @param type {model class} 指定类型，如果不指定则字段按属性名，指定了就会去取映射的字段名
+      * @param obj {object} sql条件参数
+      * @param type {BaseModel|class} 指定类型，如果不指定则字段按属性名，指定了就会去取映射的字段名
       */
      static createSqlWhere(obj: object, type?: { new(): BaseModel, _fieldMap: object;}|BaseModel): {where: string, params: Array<any>} {
          let result = {
@@ -133,8 +133,8 @@ class modelHelper {
      /**
       * 把原数据对象转为映射为表字段的对象
       * 例如: {id:1} 转为 {Fid:1}
-      * @param obj 原值对象
-      * @param type 对应的model类
+      * @param obj {object} 原值对象
+      * @param type {class|BaseModel} 对应的model类
       */
      static objectToFieldValues(obj: object, type: { new(): BaseModel, _fieldMap: object;}|BaseModel): object {
         let ret = {};

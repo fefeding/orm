@@ -60,7 +60,7 @@ class DBHelper {
 
     /**
      * 执行SQL
-     * @param pars SQL和执行参数。如：{sql: 'update table set title=? where id=?', params: ['title1', 1]}
+     * @param pars {IDBSqlParam} SQL和执行参数。如：{sql: 'update table set title=? where id=?', params: ['title1', 1]}
      * @returns {any} 受影响的行数
      */
     async execute(pars: IDBSqlParam): Promise<any> {
@@ -70,7 +70,7 @@ class DBHelper {
     /**
      * 执行有where并且为字符串的情况
      * 此函数不支持属性名到字段的映射，调用前自已处理
-     * @param pars 
+     * @param pars {IDBQueryParam}
      */
     async queryStringWhere(pars: IDBQueryParam): Promise<any> {
         //如果是数组，则做一次字段映射，并转为字符串
@@ -100,7 +100,7 @@ class DBHelper {
 
     /**
      * 获取单个数据
-     * @param pars 获取单条数据接口，{table:'table1', where: {id:1}}
+     * @param pars {IDBQueryParam} 获取单条数据接口，{table:'table1', where: {id:1}}
      */
     async get(pars: IDBQueryParam, type?: { new(): BaseModel}|any): Promise<any> {
         if(type && !pars.table) pars.table = type._tableName;
@@ -133,7 +133,8 @@ class DBHelper {
 
     /**
      * 当where为object时，采用select直接查
-     * @param pars select参数，where为object情况
+     * @param pars {IDBQueryParam} select参数，where为object情况
+     * @param type {BaseModel|type} 指定model类或实例
      */
     async select(pars: IDBQueryParam, type: {new():BaseModel, _fieldMap: object;}|BaseModel): Promise<any> {
         pars.db = pars.db || this.db;
@@ -246,7 +247,7 @@ class DBHelper {
      * @param data {BaseModel|IDBOperationParam} 新增的数据model或操作选项
      * @param table {string} 表名
      * @param db {MySql.Connection}[optional] DB连接
-     * @returns {fieldCount: 0,affectedRows: 1,insertId: 6,serverStatus: 2,warningCount: 0,message: '',protocol41: true,changedRows: 0 }
+     * @returns {IDBExecuteResult} 格式{fieldCount: 0,affectedRows: 1,insertId: 6,serverStatus: 2,warningCount: 0,message: '',protocol41: true,changedRows: 0 }
      */
     async insert(data: IDBOperationParam|BaseModel, table: string = "", db: any = null): Promise<any> {          
         //如果是IDBOperationParam，则调用eggjs相关接口

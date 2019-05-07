@@ -6,7 +6,7 @@
   "scripts": {
     "init": "npm install -g mocha",
     "test": "cd test & tsc & mocha ./index & cd ..",
-    "doc": "jsdoc2md **/*.ts > api.md"
+    "doc": "jsdoc2md **/*.js > api.md"
   },
   "types": "./index.ts",
   "repository": {
