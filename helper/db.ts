@@ -31,11 +31,12 @@ class DBHelper {
      * @param {BaseModel} [optional] 可选参数，如果指定了具体的model类，则会实例化成model的数组对象返回
      * @returns {IDBResult}
      */
-    async query(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<IDBResult> {
+    async query(pars: IDBQueryParam, type?: { new(): BaseModel}|any): Promise<IDBResult> {
         let result = {
             data: new Array<any>()
         };
         pars.columns = pars.columns || '*';
+        
         pars.db = pars.db || this.db;
         if(type && !pars.table) pars.table = type._tableName;
         if(pars.sql) {
@@ -47,7 +48,7 @@ class DBHelper {
         }
         //where为object情况，直接select
         else if(pars.where && typeof pars.where == 'object') {
-            result.data = await this.select(pars);
+            result.data = await this.select(pars, type);
         }
 
         //如果指定了需要的类型，则先转换
@@ -68,10 +69,13 @@ class DBHelper {
 
     /**
      * 执行有where并且为字符串的情况
+     * 此函数不支持属性名到字段的映射，调用前自已处理
      * @param pars 
      */
     async queryStringWhere(pars: IDBQueryParam): Promise<any> {
-        let sql = `select ${pars.columns} from ${pars.table}`;
+        //如果是数组，则做一次字段映射，并转为字符串
+        let columns = pars.columns || '*';
+        let sql = `select ${columns} from ${pars.table}`;
         if(pars.where) sql += ` where ${pars.where}`;
         //拼接排序字段
         if(pars.orders && pars.orders.length) {
@@ -91,34 +95,35 @@ class DBHelper {
                 sql += ` limit ${pars.limit}`;
             }
         }
-        return this.executeSql(sql, pars.params, pars.db);
+        return this.executeSql(sql, pars.params, pars.db||this.db);
     }
 
     /**
      * 获取单个数据
      * @param pars 获取单条数据接口，{table:'table1', where: {id:1}}
      */
-    async get(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<any> {
+    async get(pars: IDBQueryParam, type?: { new(): BaseModel}|any): Promise<any> {
         if(type && !pars.table) pars.table = type._tableName;
         pars.db = pars.db || this.db;
         if(pars.db.get) {
-            let data = await pars.db.get(pars.table, pars.where);
+            //如果有传类型，则会做一次属性到字段的映射
+            let where = type? modelHelper.objectToFieldValues(pars.where, type): pars.where;
+            let data = await pars.db.get(pars.table, where);
             if(type) data = new type(data);
             return data;
         }
         else {
+            //如果是数组，则做一次字段映射，并转为字符串
             let columns = pars.columns || '*';
-            let sql = `SELECT ${columns} FROM ${pars.table} WHERE 1=1`;
-            let params = new Array<any>();
-            let ps = modelHelper.getPropertyNames(pars.where);
-            let obj = pars.where as Map<string, any>;
-            
-            for(let i=0; i<ps.length; i++) {
-                sql += ` and \`${ps[i]}\`=?`;
-                params.push(obj[ps[i]]);
+            if(Array.isArray(columns)) {
+                columns = modelHelper.convertFields(columns, type).join(',');
             }
-                    
-            let data = await this.executeSql(sql, params, pars.db);
+            let sql = `SELECT ${columns} FROM ${pars.table}`;
+            let where = modelHelper.createSqlWhere(pars.where);
+            if(where.where) {
+                sql += ' WHERE ' + where.where;
+            }                    
+            let data = await this.executeSql(sql, where.params, pars.db);
             if(data && data.length) {
                 data = type? new type(data[0]): data[0];
             }
@@ -130,38 +135,34 @@ class DBHelper {
      * 当where为object时，采用select直接查
      * @param pars select参数，where为object情况
      */
-    async select(pars: IDBQueryParam): Promise<any> {
+    async select(pars: IDBQueryParam, type: {new():BaseModel, _fieldMap: object;}|BaseModel): Promise<any> {
         pars.db = pars.db || this.db;
+        //如果是数组，则做一次字段映射，并转为字符串
+        let columns = pars.columns || '*';
+        if(Array.isArray(columns)) {
+            columns = modelHelper.convertFields(columns, type).join(',');
+        }
         //如果是eggjs这种提供了select的，则直接调用,否则调用mysql原接口
         if(pars.db.select) {
             let condition = {
                 where: pars.where,
                 orders: pars.orders || [],
-                columns: pars.columns || '*',
+                columns: columns,
                 limit: pars.limit,
                 offset: pars.offset
             };
             return await pars.db.select(pars.table, condition);
         }
         else {
-            let strWhere = '1=1';
-            let params = new Array<any>();
-            if(pars.where) {
-                let ps = Object.getOwnPropertyNames(pars.where);
-                let obj = pars.where as Map<string, any>;
-                
-                for(let i=0; i<ps.length; i++) {
-                    strWhere += ` and \`${ps[i]}\`=?`;
-                    params.push(obj[ps[i]]);
-                }
-            }
+            let where = modelHelper.createSqlWhere(pars.where);
+            
             return await this.queryStringWhere({
                 db: pars.db,
                 table: pars.table,
-                where: strWhere,
-                params: params,
+                where: where.where,
+                params: where.params,
                 orders: pars.orders || [],
-                columns: pars.columns || '*',
+                columns: columns,
                 limit: pars.limit,
                 offset: pars.offset
             });
@@ -171,11 +172,38 @@ class DBHelper {
     /**
      * 更新数据
      * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
-     * @param pars 
+     * @param pars {BaseModel|IDBOperationParam} 需要更新model对象，或操作指定
      */
-    async update(pars: IDBOperationParam): Promise<number> {
-        pars.db = pars.db || this.db;
-        return pars.db.update(pars.table, pars.data, pars.where);
+    async update(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult> {
+        
+        db = (pars instanceof BaseModel? db: pars.db) || this.db;
+        table = table || (pars instanceof BaseModel? pars._tableName: pars.table);
+        let data = pars instanceof BaseModel? pars._dbData: pars.data;
+        //生成更新主健
+        let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
+        
+        if(db.update) {                
+            return await db.update(table, data, primaryWhere);
+        }
+        else {
+            let sql = `UPDATE ${table} SET `;                
+            let params = new Array<any>();
+
+            for(let c in data) {
+                //如果是主健，则不参与更新
+                if(primaryWhere[c] || typeof c != 'string') continue;
+                sql += ` \`${c}\` = ?,`;
+                params.push(data[c]);
+            }
+            if(sql.endsWith(',')) sql = sql.replace(/,$/, '');
+            //组合更新条件
+            let where = modelHelper.createSqlWhere(primaryWhere);
+            if(where.where) {
+                sql += ' WHERE ' + where.where;
+                params = params.concat(where.params);
+            }
+            return await this.executeSql(sql, params, db);
+        }
     }
 
     /**

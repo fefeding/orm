@@ -1,3 +1,5 @@
+import BaseModel from '../model/base';
+
 /**
  * TS 反射的一些封装
  */
@@ -47,12 +49,99 @@ class modelHelper {
 
      /**
       * 获取model类型中属性对应的表字段名
+      * 根据属性名得到对应的表字段名，这里规定死为属性名前加一个F为字段名
+      * 并把大写字母转为_小写
+      * 如果传入了_或$开头的名称，则返回空
       * @param name model中的属性名
       * @param type model的class类
       */
-     static getFieldName(name: string, type: { new();}): string {
-        let instance = new type();
-        return instance.getFieldName(name);
+     static getFieldName<T extends BaseModel>(name: string, type: { new(): T, _fieldMap: object;}|BaseModel): string {
+        if(!type) return name;
+        if(name.startsWith('_') || name.startsWith('$')) return "";
+         //映射是 field: property
+         //如果从映射中找到，则直接返回即可         
+         if(type._fieldMap[name]) return type._fieldMap[name];
+         let field = '';
+         //当不是以F开头时，认为属性名，则需要转为字段名
+         if(!/^F/.test(name)) {
+             //把类似于 firstName 这种命名转为 first_name
+            field = name.replace(/([A-Z])/g, p => '_' + p.toLowerCase());
+            field = 'F' + field;
+
+            type._fieldMap[name] = field; //缓存映射
+         }
+        
+         return field;
+     }
+
+     /**
+      * 把属性集合转为字段集合
+      * @param columns 属性的集合
+      */
+     static convertFields(columns: Array<string>, type: { new(): BaseModel, _fieldMap: object;}|BaseModel): Array<string> {
+        if(!type) return columns;
+        let ret = new Array<string>();
+        for(let i=0;i<columns.length;i++) {
+            let c = this.getFieldName(columns[i], type) || columns[i];
+            ret.push(c);
+        }
+        return ret;
+     }
+
+     /**
+      * 获取model中的主健和其值
+      * @param target model实例
+      */
+     static getPrimaryKeysWhere(target: BaseModel): object {
+        let obj = {};
+        let keys = target._primaryKeys;
+        if(keys && keys.length) {
+            for(var i=0;i<keys.length;i++) {
+                let f = target.getFieldName(keys[i]) || keys[i];
+                obj[f] = target[keys[i]];
+            }
+        }
+        return obj;
+     }
+
+     /**
+      * 生成SQL参数语句
+      * 默认会返回 
+      * {
+             where: "",
+             params: new Array<any>()
+         };
+      * @param obj sql条件参数
+      */
+     static createSqlWhere(obj: object): {where: string, params: Array<any>} {
+         let result = {
+             where: "",
+             params: new Array<any>()
+         };
+         if(!obj) return result;
+         let ps = this.getPropertyNames(obj);    
+         //组合更新条件     
+        for(let i=0; i<ps.length; i++) {
+            result.where += `\`${ps[i]}\`=? and `;
+            result.params.push(obj[ps[i]]);
+        }
+        if(result.where.endsWith(' and ')) result.where = result.where.replace(/\s*and\s*$/, '');
+        return result;
+     }
+
+     /**
+      * 把原数据对象转为映射为表字段的对象
+      * 例如: {id:1} 转为 {Fid:1}
+      * @param obj 原值对象
+      * @param type 对应的model类
+      */
+     static objectToFieldValues(obj: object, type: { new(): BaseModel, _fieldMap: object;}|BaseModel): object {
+        let ret = {};
+        for(var k in obj) {
+            let f = this.getFieldName(k, type) || k;
+            ret[f] = obj[k];
+        }
+        return ret;
      }
 
      /**

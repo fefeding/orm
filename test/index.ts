@@ -65,6 +65,7 @@ describe('测试DBHelper', ()=>{
     });
 
     var newid = 0;
+    var newmodel: MyModel;
     it('新增一个user', async ()=>{
         let m = new MyModel();
         m.name = "my name";
@@ -87,15 +88,15 @@ describe('测试DBHelper', ()=>{
             }
         });
         
-        let m2 = new MyModel(result);
+        newmodel = new MyModel(result);
         //console.log('转为MyModel', m2.toJSON());
 
         assert.ok(!!result);
-        assert.equal(m2.id, newid, m2.toString());
+        assert.equal(newmodel.id, newid, newmodel.toString());
     });
 
     it('执行修改 execute', async ()=>{
-
+        //sql修改方式
         let sql = `update ${tablename} set Fname=? where Fid=?`;
         let ret1 = await db.execute({
             db: connection,
@@ -114,6 +115,15 @@ describe('测试DBHelper', ()=>{
         //测试executeSql
         let ret2 = await db.executeSql(sql, ['new name2', newid]);
         assert.equal(ret2.affectedRows, 1, 'executeSql');
+    });
+
+    it('执行修改 update', async ()=>{
+        let m = new MyModel();
+        m.id = newid;
+        m.nickName = "update name";   
+        //测试executeSql
+        let ret = await db.update(m);
+        assert.equal(ret.affectedRows, 1, 'executeSql');
     });
 
     it('sql查询[query]', async ()=>{

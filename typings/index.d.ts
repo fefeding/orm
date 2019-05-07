@@ -67,7 +67,7 @@ declare interface IDBQueryParam extends IDBSqlParam {
     /**
      * 查询的列，默认为*
      */
-    columns?: string;
+    columns?: string|Array<string>;
 
     /**
      * 排序方式，在查询时需要

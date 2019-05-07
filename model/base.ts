@@ -186,21 +186,7 @@ class BaseModel {
       * @param {String} name 属性名
       */
      public getFieldName(name: string): string {
-        if(name.startsWith('_') || name.startsWith('$')) return "";
-         //映射是 field: property
-         //如果从映射中找到，则直接返回即可         
-         if(this._fieldMap[name]) return this._fieldMap[name];
-         let field = '';
-         //当不是以F开头时，认为属性名，则需要转为字段名
-         if(!/^F/.test(name)) {
-             //把类似于 firstName 这种命名转为 first_name
-            field = name.replace(/([A-Z])/g, p => '_' + p.toLowerCase());
-            field = 'F' + field;
-
-            this._fieldMap[name] = field; //缓存映射
-         }
-        
-         return field;
+        return modelHelper.getFieldName(name, this);
      }    
 
      /**
