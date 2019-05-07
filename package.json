@@ -11,7 +11,7 @@
   "types": "./index.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jiamao/lct-common.git"
+    "url": "git+https://github.com/jiamao/orm.git"
   },
   "keywords": [
     "fmp"
@@ -22,9 +22,9 @@
     "@types/node": "^11.13.4"
   },
   "bugs": {
-    "url": "https://github.com/jiamao/lct-common/issues"
+    "url": "https://github.com/jiamao/orm/issues"
   },
-  "homepage": "https://github.com/jiamao/lct-common#readme",
+  "homepage": "https://github.com/jiamao/orm#readme",
   "devDependencies": {
     "@types/mocha": "^5.2.6",
     "@types/mysql": "^2.15.6",
