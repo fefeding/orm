@@ -1,6 +1,6 @@
 {
   "name": "@lct/orm",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "ORM规范",
   "main": "./index.js",
   "scripts": {

@@ -174,3 +174,89 @@ declare interface IDBExecuteResult extends IDBResult {
     protocol41: boolean;
     changedRows: number;     
 }
+
+/**
+ * 提供DB操作基础库
+ * 支持分页等功能
+ */
+declare interface IDBHelper {    
+
+    /**
+     * DB操作对象，
+     * 可以是原生的mysql连接，或eggjs的
+     */
+    db: any;
+
+    /**
+     * 使用query，可用来查询或SQL执行
+     * @param {IDBQueryParam} pars 执行参数， 
+     * 1. 如果有sql属性，则只有sql和params有效。params为sql中的?参数, 例如  `{"sql": "select * from table where id=? and title like ?", params: [1, '%abc%']}`
+     * 2. 如果有where且为string， 则会拼接sql执行 where 会拼到sql的where关健词后面。如：`{table: 'table1', where: 'id=? or title=?', columns: 'id,title',orders: [['time', 'desc']]}`
+     *      结果会拼成: `select id, title from table1 where id=? or title=? order by time desc`
+     * 3. 如果where为object， 则会直接调用db的select
+     * @param {BaseModel} [optional] 可选参数，如果指定了具体的model类，则会实例化成model的数组对象返回
+     * @returns {IDBResult}
+     */
+    async query(pars: IDBQueryParam, type?: { new(): BaseModel}|any): Promise<IDBResult>;
+
+    /**
+     * 执行SQL
+     * @param pars {IDBSqlParam} SQL和执行参数。如：{sql: 'update table set title=? where id=?', params: ['title1', 1]}
+     * @returns {any} 受影响的行数
+     */
+    async execute(pars: IDBSqlParam): Promise<any>;
+
+    /**
+     * 执行有where并且为字符串的情况
+     * 此函数不支持属性名到字段的映射，调用前自已处理
+     * @param pars {IDBQueryParam}
+     */
+    async queryStringWhere(pars: IDBQueryParam): Promise<any>;
+    /**
+     * 获取单个数据
+     * @param pars {IDBQueryParam} 获取单条数据接口，{table:'table1', where: {id:1}}
+     */
+    async get(pars: IDBQueryParam, type?: { new(): BaseModel}|any): Promise<any>;
+
+    /**
+     * 当where为object时，采用select直接查
+     * @param pars {IDBQueryParam} select参数，where为object情况
+     * @param type {BaseModel|type} 指定model类或实例
+     */
+    async select(pars: IDBQueryParam, type: {new():BaseModel, _fieldMap: object;}|BaseModel): Promise<any>;
+
+    /**
+     * 更新数据
+     * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
+     * @param pars {BaseModel|IDBOperationParam} 需要更新model对象，或操作指定
+     * @param table {String}[optinal] 表名，如果不指定则从pars中读
+     * @param db {any}[optional] 当前DB连接，不指定则用当前实例DB
+     */
+    async update(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult>;
+
+    /**
+     * 删除数据
+     * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
+     * @param pars {BaseModel|IDBOperationParam} 需要更新model对象，或操作指定
+     * @param table {String}[optinal] 表名，如果不指定则从pars中读
+     * @param db {any}[optional] 当前DB连接，不指定则用当前实例DB
+     */
+    async delete(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult>;
+
+    /**
+     * 往DB里插入一个model对象
+     * @param data {BaseModel|IDBOperationParam} 新增的数据model或操作选项
+     * @param table {string} 表名
+     * @param db {MySql.Connection}[optional] DB连接
+     * @returns {IDBExecuteResult} 格式{fieldCount: 0,affectedRows: 1,insertId: 6,serverStatus: 2,warningCount: 0,message: '',protocol41: true,changedRows: 0 }
+     */
+    async insert(data: IDBOperationParam|BaseModel, table: string = "", db: any = null): Promise<any>;
+
+    /**
+     * 执行sql
+     * @param sql 要执行的SQL 例如sql="select * from id=?"
+     * @param params SQL中的参数，例如[1]
+     * @param db DB连接
+     */
+    async executeSql(sql: string, params: any=[], db: any=null): Promise<any>;
+}

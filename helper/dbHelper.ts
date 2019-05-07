@@ -6,7 +6,7 @@ import modelHelper from "./modelHelper";
  * 提供DB操作基础库
  * 支持分页等功能
  */
-class DBHelper {
+class DBHelper implements IDBHelper {
     /**
      * 生成DB实例
      * @param db DB操作对象，mysql的connection或 eggjs的
