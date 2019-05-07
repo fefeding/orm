@@ -1,6 +1,6 @@
 {
   "name": "@lct/orm",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "ORM规范",
   "main": "./index.js",
   "scripts": {
@@ -18,8 +18,7 @@
   ],
   "author": "jiamao",
   "license": "MIT",
-  "dependencies": {
-    "@types/node": "^11.13.4"
+  "dependencies": {    
   },
   "bugs": {
     "url": "https://github.com/jiamao/orm/issues"
@@ -28,7 +27,7 @@
   "devDependencies": {
     "@types/mocha": "^5.2.6",
     "@types/mysql": "^2.15.6",
-    "@types/node": "^11.13.2",
+    "@types/node": "^11.13.4",
     "egg-mysql": "^3.0.0",
     "mysql": "^2.17.1",
     "tslib": "^1.9.3"
