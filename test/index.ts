@@ -32,14 +32,17 @@ let user = new MyModel2();
 console.log(Object.getPrototypeOf(user));
 
 //本地测试数据库
+//先准备好测试DB
 const connection = mysql.createConnection({
     host     : 'localhost',
-    user     : 'root',
-    password : 'df123456',
+    user     : 'jiamao',
+    password : '123456',
     database : 'test',
     charset  : 'utf8'
   });
 
+  //实例化DB操作
+const db = new DBHelper(connection);
 
 describe('测试DBHelper', ()=>{
     before(()=>{
@@ -68,7 +71,7 @@ describe('测试DBHelper', ()=>{
         m.nickName = "my";
         console.log(m.toString());
 
-        let ret1 = await DBHelper.insert(connection, m, tablename); 
+        let ret1 = await db.insert(m); 
         assert.ok(ret1.insertId > 0);
 
         newid = ret1.insertId;        
@@ -76,7 +79,7 @@ describe('测试DBHelper', ()=>{
 
     it('查询单个user', async ()=>{
         
-        let result = await DBHelper.get({
+        let result = await db.get({
             db: connection,
             table: tablename,
             where: {
@@ -94,14 +97,14 @@ describe('测试DBHelper', ()=>{
     it('执行修改 execute', async ()=>{
 
         let sql = `update ${tablename} set Fname=? where Fid=?`;
-        let ret1 = await DBHelper.execute({
+        let ret1 = await db.execute({
             db: connection,
             sql: sql,
             params: ['new name', newid]
         });
         assert.equal(ret1.affectedRows, 1, 'execute');
         //测试executeSql
-        let ret2 = await DBHelper.executeSql(connection, sql, ['new name2', newid]);
+        let ret2 = await db.executeSql(sql, ['new name2', newid]);
         assert.equal(ret2.affectedRows, 1, 'executeSql');
     });
 
@@ -109,14 +112,13 @@ describe('测试DBHelper', ()=>{
 
         let sql = `update ${tablename} set Fname=? where Fid=?`;       
         //测试executeSql
-        let ret2 = await DBHelper.executeSql(connection, sql, ['new name2', newid]);
+        let ret2 = await db.executeSql(sql, ['new name2', newid]);
         assert.equal(ret2.affectedRows, 1, 'executeSql');
     });
 
     it('sql查询[query]', async ()=>{
         //sql带参数的直接执行方式
-        let data = await DBHelper.query({
-            db: connection,
+        let data = await db.query({
             sql: `select * from ${tablename} where Fname like ? limit 2`,
             params: ['%name%']
         }, MyModel);
@@ -126,8 +128,7 @@ describe('测试DBHelper', ()=>{
 
     it('where为字符串，并设定起始条数的 查询', async ()=>{
         //where 查询
-        let data = await DBHelper.query({
-            db: connection,
+        let data = await db.query({
             columns: '*',
             table: tablename,
             where: `Fname like ?`,
@@ -141,8 +142,7 @@ describe('测试DBHelper', ()=>{
 
     it('where为object，并设定起始条数的 查询', async ()=>{
         //where 查询
-        let data = await DBHelper.query({
-            db: connection,
+        let data = await db.query({
             columns: '*',
             table: tablename,
             where: {

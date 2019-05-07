@@ -14,7 +14,7 @@ declare interface IDBParam {
     /**
      * 操作DB原生接口
      */
-    db: {
+    db?: {
         select: Function;
         query: Function;
         update: Function;

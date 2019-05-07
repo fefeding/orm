@@ -8,6 +8,20 @@ import modelHelper from "./modelHelper";
  */
 class DBHelper {
     /**
+     * 生成DB实例
+     * @param db DB操作对象，mysql的connection或 eggjs的
+     */
+    constructor(db: any = null) {
+        this.db = db;
+    }
+
+    /**
+     * DB操作对象，
+     * 可以是原生的mysql连接，或eggjs的
+     */
+    public db: any;
+
+    /**
      * 使用query，可用来查询或SQL执行
      * @param {IDBQueryParam} pars 执行参数， 
      * 1. 如果有sql属性，则只有sql和params有效。params为sql中的?参数, 例如  `{"sql": "select * from table where id=? and title like ?", params: [1, '%abc%']}`
@@ -17,11 +31,12 @@ class DBHelper {
      * @param {BaseModel} [optional] 可选参数，如果指定了具体的model类，则会实例化成model的数组对象返回
      * @returns {IDBResult}
      */
-    static async query(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<IDBResult> {
+    async query(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<IDBResult> {
         let result = {
             data: new Array<any>()
         };
         pars.columns = pars.columns || '*';
+        pars.db = pars.db || this.db;
         if(type && !pars.table) pars.table = type._tableName;
         if(pars.sql) {
             result.data = await this.execute(pars);
@@ -47,16 +62,17 @@ class DBHelper {
      * @param pars SQL和执行参数。如：{sql: 'update table set title=? where id=?', params: ['title1', 1]}
      * @returns {any} 受影响的行数
      */
-    static async execute(pars: IDBSqlParam): Promise<any> {
-        return this.executeSql(pars.db, pars.sql || '', pars.params);
+    async execute(pars: IDBSqlParam): Promise<any> {
+        return this.executeSql(pars.sql || '', pars.params, pars.db || this.db);
     }
 
     /**
      * 执行有where并且为字符串的情况
      * @param pars 
      */
-    static async queryStringWhere(pars: IDBQueryParam): Promise<any> {
-        let sql = `select ${pars.columns} from ${pars.table} where ${pars.where}`;
+    async queryStringWhere(pars: IDBQueryParam): Promise<any> {
+        let sql = `select ${pars.columns} from ${pars.table}`;
+        if(pars.where) sql += ` where ${pars.where}`;
         //拼接排序字段
         if(pars.orders && pars.orders.length) {
             let ordersql = '';
@@ -75,15 +91,16 @@ class DBHelper {
                 sql += ` limit ${pars.limit}`;
             }
         }
-        return this.executeSql(pars.db, sql, pars.params);
+        return this.executeSql(sql, pars.params, pars.db);
     }
 
     /**
      * 获取单个数据
      * @param pars 获取单条数据接口，{table:'table1', where: {id:1}}
      */
-    static async get(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<any> {
+    async get(pars: IDBQueryParam, type: { new(): BaseModel}|any = undefined): Promise<any> {
         if(type && !pars.table) pars.table = type._tableName;
+        pars.db = pars.db || this.db;
         if(pars.db.get) {
             let data = await pars.db.get(pars.table, pars.where);
             if(type) data = new type(data);
@@ -101,7 +118,7 @@ class DBHelper {
                 params.push(obj[ps[i]]);
             }
                     
-            let data = await this.executeSql(pars.db, sql, params);
+            let data = await this.executeSql(sql, params, pars.db);
             if(data && data.length) {
                 data = type? new type(data[0]): data[0];
             }
@@ -113,7 +130,8 @@ class DBHelper {
      * 当where为object时，采用select直接查
      * @param pars select参数，where为object情况
      */
-    static async select(pars: IDBQueryParam): Promise<any> {
+    async select(pars: IDBQueryParam): Promise<any> {
+        pars.db = pars.db || this.db;
         //如果是eggjs这种提供了select的，则直接调用,否则调用mysql原接口
         if(pars.db.select) {
             let condition = {
@@ -155,7 +173,8 @@ class DBHelper {
      * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
      * @param pars 
      */
-    static async update(pars: IDBOperationParam): Promise<number> {
+    async update(pars: IDBOperationParam): Promise<number> {
+        pars.db = pars.db || this.db;
         return pars.db.update(pars.table, pars.data, pars.where);
     }
 
@@ -164,36 +183,40 @@ class DBHelper {
      * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
      * @param pars 
      */
-    static async delete(pars: IDBOperationParam): Promise<number> {
+    async delete(pars: IDBOperationParam): Promise<number> {
+        pars.db = pars.db || this.db;
         return pars.db.delete(pars.table, pars.where);
     }
 
     /**
      * 往DB里插入一个model对象
-     * @param db {MySql.Connection} DB连接
+     * @param data {BaseModel|IDBOperationParam} 新增的数据model或操作选项
      * @param table {string} 表名
-     * @param data {BaseModel} 新增的数据model
+     * @param db {MySql.Connection}[optional] DB连接
      * @returns {fieldCount: 0,affectedRows: 1,insertId: 6,serverStatus: 2,warningCount: 0,message: '',protocol41: true,changedRows: 0 }
      */
-    static async insert(db: any|IDBOperationParam, data: BaseModel, table: string = ""): Promise<any> {   
+    async insert(data: IDBOperationParam|BaseModel, table: string = "", db: any = null): Promise<any> {          
         //如果是IDBOperationParam，则调用eggjs相关接口
-        if(db && db.db) {
-            return db.db.insert(db.table, db.data);
+        if(data && data instanceof BaseModel) {
+            table = table || data._tableName;
+            db = db || this.db; 
+            let sql = `INSERT INTO ${table} SET ?`;
+            return this.executeSql(sql, data._dbData, db);            
         }   
-        table = table || data._tableName;
-        let sql = `INSERT INTO ${table} SET ?`;
-        return this.executeSql(db, sql, data._dbData);
+        else if(data.db) {
+            return data.db.insert(table||data.table, data.data);
+        }
     }
 
     /**
-     * 
-     * @param db DB连接
+     * 执行sql
      * @param sql 要执行的SQL 例如sql="select * from id=?"
      * @param params SQL中的参数，例如[1]
+     * @param db DB连接
      */
-    static async executeSql(db: any, sql: string, params: any=[]): Promise<any> {
-        return new Promise((resolve, reject) => {
-            
+    async executeSql(sql: string, params: any=[], db: any=null): Promise<any> {
+        db = db || this.db; 
+        return new Promise((resolve, reject) => {            
             let qry = db.query(sql, params, (err, results)=>{                
                 if(err) {
                     if(reject) reject(err);
