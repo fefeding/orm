@@ -8,9 +8,11 @@ import * as assert from "assert";
 let tablename = 't_user';
 let primarykeys = ['id'];
 
-@BaseModel.Table(tablename, primarykeys) //关联表t_user, 且主健为id,  非必须，各接口可以手动传入
+@BaseModel.Table(tablename) //关联表t_user, 且主健为id,  非必须，各接口可以手动传入
+//@BaseModel.Table(tablename, ['id'])//可以从这里指定多个主健，也可以在属性中去指定
 class MyModel extends BaseModel {  
     @BaseModel.TableField('Fid') //映射属性跟字段, 非必须。如果不指定，则默认会在前加上F，并把大写字母转为_加小写来映射
+    @BaseModel.TablePrimaryKey() //指定当前属性为唯一健
     id: number = 0;
     name: string = "";
     nickName: string = "";

@@ -97,7 +97,7 @@ class modelHelper {
         if(keys && keys.length) {
             for(var i=0;i<keys.length;i++) {
                 let f = target.getFieldName(keys[i]) || keys[i];
-                obj[f] = target[keys[i]];
+                obj[f] = target[keys[i]] || target._dbData[f];
             }
         }
         return obj;

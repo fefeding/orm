@@ -212,12 +212,13 @@ class BaseModel implements IBaseModel {
      /**
       * 表名装饰器
       * @param {String} name 表名
+      * @param {Array<string>}[optional] 要吧指定表的唯一健,可以是属性名或字段名
       */
      static Table(name: string, primaryKeys: Array<string> = []) {
         return (constructor: Function) => {            
             constructor.prototype[TableNameId] = name;   
             if(primaryKeys && primaryKeys.length) {
-                this.TablePrimaryKey(primaryKeys)(constructor);
+                this.TablePrimaryKey()(constructor.prototype, primaryKeys);
             }         
         };  
     }
@@ -236,21 +237,22 @@ class BaseModel implements IBaseModel {
 
     /**
      * 表唯一健装饰器
+     * 可以用到属性上
      * "experimentalDecorators": true,
      */
-    static TablePrimaryKey(name: string|Array<string>) {
-        return (constructor: Function) => {
-            if(!constructor.prototype[PrimaryKeyId]) {
-                constructor.prototype[PrimaryKeyId] = [];
+    static TablePrimaryKey() {
+        return (target: any, name: string|Array<string>): any => {
+            if(!target[PrimaryKeyId]) {
+                target[PrimaryKeyId] = [];
             }
             if(Array.isArray(name)) {
-                constructor.prototype[PrimaryKeyId] = name;
+                target[PrimaryKeyId] = target[PrimaryKeyId].concat(name);
             }
             else {
-                let v = constructor.prototype[PrimaryKeyId];
+                let v = target[PrimaryKeyId];
                 if(!v.includes(name)) v.push(name);
             }
-        };  
+        }        
     }
  }
 

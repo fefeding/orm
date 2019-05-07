@@ -11,7 +11,7 @@ class DBHelper implements IDBHelper {
      * 生成DB实例
      * @param {Mysql} db DB操作对象，mysql的connection或 eggjs的
      */
-    constructor(db: any = null) {
+    constructor(db?: any) {
         if(db && db instanceof DBHelper) db = db.db;
         this.db = db;
     }

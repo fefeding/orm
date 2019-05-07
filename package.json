@@ -1,6 +1,6 @@
 {
   "name": "@lct/orm",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "ORM规范",
   "main": "./index.js",
   "scripts": {
@@ -14,12 +14,12 @@
     "url": "git+https://github.com/jiamao/orm.git"
   },
   "keywords": [
-    "fmp"
+    "orm",
+    "dbhelper"
   ],
   "author": "jiamao",
   "license": "MIT",
-  "dependencies": {    
-  },
+  "dependencies": {},
   "bugs": {
     "url": "https://github.com/jiamao/orm/issues"
   },
