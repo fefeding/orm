@@ -9,17 +9,7 @@
 ```javascript
 npm install @lct/orm
 ```
-#### 准备DB
-创建表 `t_user`
-```sql
-CREATE TABLE `t_user` (
-  `Fid` int(11) NOT NULL AUTO_INCREMENT,
-  `Fname` varchar(64) DEFAULT NULL,
-  `Fnick_name` varchar(64) DEFAULT NULL,
-  `Fcreate_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`Fid`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
-```
+
 #### 定义Model
 Model我们认为是跟表一一对应的类。
 ```javascript

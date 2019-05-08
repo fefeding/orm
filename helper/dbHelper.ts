@@ -282,6 +282,10 @@ class DBHelper implements IDBHelper {
      */
     async executeSql(sql: string, params: any=[], db: any=null): Promise<any> {
         db = db || this.db; 
+        //如果是eggjs-mysql，则直接调用await返回
+        if(db.constructor && db.constructor.name == 'RDSClient') {
+            return await db.query(sql, params);
+        }
         return new Promise((resolve, reject) => {            
             let qry = db.query(sql, params, (err, results)=>{                
                 if(err) {
