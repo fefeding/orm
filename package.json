@@ -1,6 +1,6 @@
 {
   "name": "@lct/orm",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "description": "ORM规范",
   "main": "./index.js",
   "scripts": {
@@ -8,7 +8,6 @@
     "test": "cd test & tsc & mocha ./index & cd ..",
     "doc": "tsc && jsdoc2md helper/*.js model/*.js > api.md"
   },
-  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jiamao/orm.git"
