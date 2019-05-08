@@ -213,9 +213,9 @@ class BaseModel implements IBaseModel {
       * 把原始数据组转为当前model数组
       * @param {Array} data 原始数据数组
       * @static
-      * @returns {Array<BaseModel>}
+      * @returns {Array<any>}
       */
-     public static toArray(data: Array<any>): Array<BaseModel> {
+     public static toArray(data: Array<any>): Array<any> {
         return modelHelper.toArray(data, this);
      }
 
