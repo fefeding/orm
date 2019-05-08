@@ -22,10 +22,13 @@
       "inlineSourceMap": true,
       "importHelpers": true,
       "lib": [
+        "dom",
         "es2015",
         "es2016",
         "es2015.iterable",
         "es2015.generator"
       ]
-    }
+    },
+    "exclude": [
+    ]
   }

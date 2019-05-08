@@ -1,6 +1,6 @@
 {
   "name": "@lct/orm",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "ORM规范",
   "main": "./index.js",
   "scripts": {
@@ -28,9 +28,11 @@
   },
   "homepage": "https://github.com/jiamao/orm#readme",
   "devDependencies": {
+    "@types/assert": "^1.4.2",
     "@types/mocha": "^5.2.6",
     "@types/mysql": "^2.15.6",
     "@types/node": "^11.13.4",
+    "assert": "^1.4.1",
     "egg-mysql": "^3.0.0",
     "mysql": "^2.17.1"
   }
