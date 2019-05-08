@@ -8,7 +8,7 @@
     "test": "cd test & tsc & mocha ./index & cd ..",
     "doc": "tsc && jsdoc2md helper/*.js model/*.js > api.md"
   },
-  "types": "./index.ts",
+  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jiamao/orm.git"

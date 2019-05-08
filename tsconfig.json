@@ -1,6 +1,8 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
+      "baseUrl": ".",
+      "paths": { "*": ["types/*"] },
       "target": "es2017",
       "module": "commonjs",
       "strict": true,

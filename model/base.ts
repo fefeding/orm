@@ -224,7 +224,7 @@ class BaseModel implements IBaseModel {
       * @param {String} name 表名
       * @param {Array<string>}[optional] 要吧指定表的唯一健,可以是属性名或字段名
       */
-     static Table(name: string, primaryKeys: Array<string> = []) {
+     static Table(name: string, primaryKeys?: Array<string>) {
         return (constructor: Function) => {            
             constructor.prototype[TableNameId] = name;   
             if(primaryKeys && primaryKeys.length) {
