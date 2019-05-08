@@ -207,7 +207,17 @@ class BaseModel implements IBaseModel {
      public toString(): string {
         let obj = this.toJSON();
         return JSON.stringify(obj);
-     }     
+     } 
+     
+     /**
+      * 把原始数据组转为当前model数组
+      * @param {Array} data 原始数据数组
+      * @static
+      * @returns {Array<BaseModel>}
+      */
+     public static toArray(data: Array<any>): Array<BaseModel> {
+        return modelHelper.toArray(data, this);
+     }
 
      /**
       * 表名装饰器
