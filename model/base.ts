@@ -187,7 +187,10 @@ class BaseModel implements IBaseModel {
       */
      public getFieldName(name: string): string {
         return modelHelper.getFieldName(name, this);
-     }    
+     }  
+     public static getFieldName(name: string): string {
+        return modelHelper.getFieldName(name, this);
+     }      
 
      /**
       * 转为json
