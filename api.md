@@ -52,15 +52,18 @@
 
 * [DBHelper](#DBHelper)
     * [new DBHelper(db)](#new_DBHelper_new)
-    * [.query(pars, [optional])](#DBHelper+query) ⇒ <code>IDBResult</code>
-    * [.execute(pars)](#DBHelper+execute) ⇒ <code>any</code>
-    * [.queryStringWhere(pars)](#DBHelper+queryStringWhere)
-    * [.get(pars)](#DBHelper+get)
-    * [.select(pars, type)](#DBHelper+select)
-    * [.update(pars, table, db)](#DBHelper+update)
-    * [.delete(pars, table, db)](#DBHelper+delete)
-    * [.insert(data, table, db)](#DBHelper+insert) ⇒ <code>IDBExecuteResult</code>
-    * [.executeSql(sql, params, db)](#DBHelper+executeSql)
+    * _instance_
+        * [.query(pars, [optional])](#DBHelper+query) ⇒ <code>IDBResult</code>
+        * [.execute(pars)](#DBHelper+execute) ⇒ <code>any</code>
+        * [.queryStringWhere(pars)](#DBHelper+queryStringWhere)
+        * [.get(pars)](#DBHelper+get)
+        * [.select(pars, type)](#DBHelper+select)
+        * [.update(pars, table, db)](#DBHelper+update)
+        * [.delete(pars, table, db)](#DBHelper+delete)
+        * [.insert(data, table, db)](#DBHelper+insert) ⇒ <code>IDBExecuteResult</code>
+        * [.executeSql(sql, params, db)](#DBHelper+executeSql)
+    * _static_
+        * [.apply(target)](#DBHelper.apply)
 
 <a name="new_DBHelper_new"></a>
 
@@ -68,9 +71,9 @@
 生成DB实例
 
 
-| Param | Default | Description |
+| Param | Type | Description |
 | --- | --- | --- |
-| db | <code></code> | DB操作对象，mysql的connection或 eggjs的 |
+| db | <code>Mysql</code> | DB操作对象，mysql的connection或 eggjs的 |
 
 <a name="DBHelper+query"></a>
 
@@ -182,6 +185,17 @@
 | sql |  | 要执行的SQL 例如sql="select * from id=?" |
 | params |  | SQL中的参数，例如[1] |
 | db | <code></code> | DB连接 |
+
+<a name="DBHelper.apply"></a>
+
+### DBHelper.apply(target)
+给对象混入db操作实例接口
+
+**Kind**: static method of [<code>DBHelper</code>](#DBHelper)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| target | <code>class</code> \| <code>object</code> | 需要混入DBHelper的实例 |
 
 <a name="modelHelper"></a>
 
@@ -300,7 +314,8 @@ TS 反射的一些封装
         * [._primaryKeys](#BaseModel._primaryKeys) : <code>Array.&lt;string&gt;</code>
         * [._tableName](#BaseModel._tableName) : <code>string</code>
         * [._fieldMap](#BaseModel._fieldMap) : <code>Map</code>
-        * [.Table(name)](#BaseModel.Table)
+        * [.toArray(data)](#BaseModel.toArray) ⇒ <code>Array.&lt;any&gt;</code>
+        * [.Table(name, [optional])](#BaseModel.Table)
         * [.TableField(field)](#BaseModel.TableField)
         * [.TablePrimaryKey()](#BaseModel.TablePrimaryKey)
 
@@ -387,9 +402,20 @@ TS 反射的一些封装
 | --- |
 | _fieldMap | 
 
+<a name="BaseModel.toArray"></a>
+
+### BaseModel.toArray(data) ⇒ <code>Array.&lt;any&gt;</code>
+把原始数据组转为当前model数组
+
+**Kind**: static method of [<code>BaseModel</code>](#BaseModel)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| data | <code>Array</code> | 原始数据数组 |
+
 <a name="BaseModel.Table"></a>
 
-### BaseModel.Table(name)
+### BaseModel.Table(name, [optional])
 表名装饰器
 
 **Kind**: static method of [<code>BaseModel</code>](#BaseModel)  
@@ -397,6 +423,7 @@ TS 反射的一些封装
 | Param | Type | Description |
 | --- | --- | --- |
 | name | <code>String</code> | 表名 |
+| [optional] | <code>Array.&lt;string&gt;</code> | 要吧指定表的唯一健,可以是属性名或字段名 |
 
 <a name="BaseModel.TableField"></a>
 
@@ -412,7 +439,7 @@ TS 反射的一些封装
 <a name="BaseModel.TablePrimaryKey"></a>
 
 ### BaseModel.TablePrimaryKey()
-表唯一健装饰器"experimentalDecorators": true,
+表唯一健装饰器可以用到属性上"experimentalDecorators": true,
 
 **Kind**: static method of [<code>BaseModel</code>](#BaseModel)  
 <a name="toJSON"></a>
