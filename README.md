@@ -58,3 +58,11 @@ async insert() {
     connection.end();
 }
 ```
+
+#### 测试用例
+ 测试用例是基于mocha的，依赖`mocha`和`assert`。 <br />
+ 表结构参见`test/t_user.sql`，更新`test/index.ts`中的数据库连接信息。  <br />
+ 装上依赖后直接执行以下命令即可。 <br />
+```
+npm run test
+```
