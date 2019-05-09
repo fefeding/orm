@@ -3,7 +3,7 @@
 
 ## 介绍
 本项目为基于`typescript`的一个ORM规范。对`Model`做一个约定，提供DB访问ORM接口。
-
+> 接口：[https://github.com/jiamao/orm/blob/master/api.md](https://github.com/jiamao/orm/blob/master/api.md)
 ## 快速上手
 #### 安装
 ```javascript
