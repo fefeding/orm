@@ -4,7 +4,7 @@ import BaseModel from '../model/base';
  * TS 反射的一些封装
  */
 
-class modelHelper {
+class ModelHelper {
     /**
      * 获取对象的属性名称集合
      * 如果继承自 BaseModel ，则到BaseModel后不会再往上查找
@@ -163,4 +163,4 @@ class modelHelper {
      }
 }
 
-export default modelHelper;
+export default ModelHelper;

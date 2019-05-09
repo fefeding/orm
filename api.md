@@ -5,7 +5,7 @@
 <dd><p>提供DB操作基础库
 支持分页等功能</p>
 </dd>
-<dt><a href="#modelHelper">modelHelper</a></dt>
+<dt><a href="#ModelHelper">ModelHelper</a></dt>
 <dd><p>TS 反射的一些封装</p>
 </dd>
 <dt><a href="#BaseModel">BaseModel</a></dt>
@@ -197,100 +197,100 @@
 | --- | --- | --- |
 | target | <code>class</code> \| <code>object</code> | 需要混入DBHelper的实例 |
 
-<a name="modelHelper"></a>
+<a name="ModelHelper"></a>
 
-## modelHelper
+## ModelHelper
 TS 反射的一些封装
 
 **Kind**: global class  
 
-* [modelHelper](#modelHelper)
-    * [.getPropertyNames(target)](#modelHelper.getPropertyNames) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.toArray(data)](#modelHelper.toArray) ⇒ <code>Array.&lt;Model&gt;</code>
-    * [.getFieldName(name, type)](#modelHelper.getFieldName)
-    * [.convertFields(columns)](#modelHelper.convertFields)
-    * [.getPrimaryKeysWhere(target)](#modelHelper.getPrimaryKeysWhere)
-    * [.createSqlWhere(obj, type)](#modelHelper.createSqlWhere)
-    * [.objectToFieldValues(obj, type)](#modelHelper.objectToFieldValues)
+* [ModelHelper](#ModelHelper)
+    * [.getPropertyNames(target)](#ModelHelper.getPropertyNames) ⇒ <code>Array.&lt;string&gt;</code>
+    * [.toArray(data)](#ModelHelper.toArray) ⇒ <code>Array.&lt;Model&gt;</code>
+    * [.getFieldName(name, type)](#ModelHelper.getFieldName)
+    * [.convertFields(columns)](#ModelHelper.convertFields)
+    * [.getPrimaryKeysWhere(target)](#ModelHelper.getPrimaryKeysWhere)
+    * [.createSqlWhere(obj, type)](#ModelHelper.createSqlWhere)
+    * [.objectToFieldValues(obj, type)](#ModelHelper.objectToFieldValues)
 
-<a name="modelHelper.getPropertyNames"></a>
+<a name="ModelHelper.getPropertyNames"></a>
 
-### modelHelper.getPropertyNames(target) ⇒ <code>Array.&lt;string&gt;</code>
+### ModelHelper.getPropertyNames(target) ⇒ <code>Array.&lt;string&gt;</code>
 获取对象的属性名称集合如果继承自 BaseModel ，则到BaseModel后不会再往上查找
 
-**Kind**: static method of [<code>modelHelper</code>](#modelHelper)  
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
 **Returns**: <code>Array.&lt;string&gt;</code> - 属性名称数组  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | target | <code>class</code> | 需要获取属性的实例 |
 
-<a name="modelHelper.toArray"></a>
+<a name="ModelHelper.toArray"></a>
 
-### modelHelper.toArray(data) ⇒ <code>Array.&lt;Model&gt;</code>
+### ModelHelper.toArray(data) ⇒ <code>Array.&lt;Model&gt;</code>
 把原始数据组转为当前model数组
 
-**Kind**: static method of [<code>modelHelper</code>](#modelHelper)  
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | data | <code>Array</code> | 原始数据数组 |
 
-<a name="modelHelper.getFieldName"></a>
+<a name="ModelHelper.getFieldName"></a>
 
-### modelHelper.getFieldName(name, type)
+### ModelHelper.getFieldName(name, type)
 获取model类型中属性对应的表字段名根据属性名得到对应的表字段名，这里规定死为属性名前加一个F为字段名并把大写字母转为_小写如果传入了_或$开头的名称，则返回空
 
-**Kind**: static method of [<code>modelHelper</code>](#modelHelper)  
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
 
 | Param | Description |
 | --- | --- |
 | name | model中的属性名 |
 | type | model的class类 |
 
-<a name="modelHelper.convertFields"></a>
+<a name="ModelHelper.convertFields"></a>
 
-### modelHelper.convertFields(columns)
+### ModelHelper.convertFields(columns)
 把属性集合转为字段集合
 
-**Kind**: static method of [<code>modelHelper</code>](#modelHelper)  
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
 
 | Param | Description |
 | --- | --- |
 | columns | 属性的集合 |
 
-<a name="modelHelper.getPrimaryKeysWhere"></a>
+<a name="ModelHelper.getPrimaryKeysWhere"></a>
 
-### modelHelper.getPrimaryKeysWhere(target)
+### ModelHelper.getPrimaryKeysWhere(target)
 获取model中的主健和其值
 
-**Kind**: static method of [<code>modelHelper</code>](#modelHelper)  
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
 
 | Param | Description |
 | --- | --- |
 | target | model实例 |
 
-<a name="modelHelper.createSqlWhere"></a>
+<a name="ModelHelper.createSqlWhere"></a>
 
-### modelHelper.createSqlWhere(obj, type)
+### ModelHelper.createSqlWhere(obj, type)
 生成SQL参数语句默认会返回{
             where: "",
             params: new Array<any>()
         };
 
-**Kind**: static method of [<code>modelHelper</code>](#modelHelper)  
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | obj | <code>object</code> | sql条件参数 |
 | type | [<code>BaseModel</code>](#BaseModel) \| <code>class</code> | 指定类型，如果不指定则字段按属性名，指定了就会去取映射的字段名 |
 
-<a name="modelHelper.objectToFieldValues"></a>
+<a name="ModelHelper.objectToFieldValues"></a>
 
-### modelHelper.objectToFieldValues(obj, type)
+### ModelHelper.objectToFieldValues(obj, type)
 把原数据对象转为映射为表字段的对象例如: {id:1} 转为 {Fid:1}
 
-**Kind**: static method of [<code>modelHelper</code>](#modelHelper)  
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
 
 | Param | Type | Description |
 | --- | --- | --- |
