@@ -238,13 +238,18 @@ class BaseModel implements IBaseModel {
     /**
      * 表字段装饰器
      * @param {String} field 字段名
+     * @param {Boolean}[optional] isPrimary 是否为主健，不设置则不处理
      */
-    static TableField(field: string) {
+    static TableField(field: string, isPrimary?: boolean) {
         return (target: any, name: string): any => {
             if(!target[TableFieldMapId]) {
                 target[TableFieldMapId] = {};
             }
             target[TableFieldMapId][name] = field;
+            //设定为主健
+            if(isPrimary === true) {
+                this.TablePrimaryKey()(target, name);
+            }
         }
     } 
 
