@@ -21,7 +21,10 @@ class BaseModel implements IBaseModel {
       */
      constructor(data: any = "", map = {}) {
 
-        this._dbData = {};
+        this.$dbData = {};
+
+        //所有model采用代理方法，从DB中取值
+        let obj = modelHelper.createModelProxy(this);
 
         if(data) {
             if(typeof data == 'string') {
@@ -30,45 +33,23 @@ class BaseModel implements IBaseModel {
             }
             //DB原数据
             else if(typeof data == 'object' && data.constructor && data.constructor.name == 'RowDataPacket') {
-                this._dbData = data;
+                this.$dbData = data;
             }
             else if(typeof data == 'object') {
-                Object.assign(this, data);//浅拷贝
+                Object.assign(obj, data);//浅拷贝
             }            
         }        
-        this._fieldMap = Object.assign(this._fieldMap||{}, map);
+        this._fieldMap = Object.assign(this._fieldMap||{}, map);       
         
-        //所有model采用代理方法，从DB中取值
-        return new Proxy<BaseModel>(this, {
-            get: function (target, key, receiver) {                
-                if(typeof key == 'string' && !key.startsWith('_') && !key.startsWith('$')) {
-                    let pros = modelHelper.getPropertyNames(target);
-                    if(pros.includes(key)) {
-                        let v = target.getValue(key, receiver);
-                        if(typeof v != 'undefined') return v;
-                    }
-                }
-                return Reflect.get(target, key, receiver);
-            },
-            set: function (target, key, value, receiver) {                
-                if(typeof key == 'string' && !key.startsWith('_') && !key.startsWith('$')) {
-                    let pros = modelHelper.getPropertyNames(target);
-                    if(pros.includes(key)) {
-                        target.setValue(key, value, receiver);
-                        return true;
-                    }
-                }
-                return Reflect.set(target, key, value, receiver);
-            }
-          });
+        return obj;
      } 
 
     /**
      * DB原始数据对象
-     * @property _dbData
+     * @property $dbData
      * @type Object
      */
-    public _dbData: object; 
+    public $dbData: object; 
 
     /**
      * 当前对应表的唯一健
@@ -155,9 +136,9 @@ class BaseModel implements IBaseModel {
       * @param {string} name 属性名，也可以是在DB中的字段名
       */
      public getValue(name: string, receiver?: any): any {
-        if(!this._dbData) return null;
+        if(!this.$dbData) return null;
         let field = this.getFieldName(name);
-        if(field) return this._dbData[field];
+        if(field) return this.$dbData[field];
         else {
             return Reflect.get(this, name, receiver);
         }
@@ -169,9 +150,9 @@ class BaseModel implements IBaseModel {
       * @param {any} value 设置值
       */
      public setValue(name: string, value: any, receiver?: any): void {
-        if(this._dbData) {
+        if(this.$dbData) {
             let field = this.getFieldName(name);
-            this._dbData[field] = value;
+            this.$dbData[field] = value;
         }
         else {
             Reflect.set(this, name, value, receiver);

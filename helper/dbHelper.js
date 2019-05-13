@@ -185,7 +185,7 @@ class DBHelper {
     async update(pars, table, db) {
         db = (pars instanceof base_1.default ? db : pars.db) || this.db;
         table = table || (pars instanceof base_1.default ? pars._tableName : pars.table);
-        let data = pars instanceof base_1.default ? pars._dbData : pars.data;
+        let data = pars instanceof base_1.default ? pars.$dbData : pars.data;
         //生成更新主健
         let primaryWhere = pars instanceof base_1.default ? modelHelper_1.default.getPrimaryKeysWhere(pars) : pars.where;
         if (db.update) {
@@ -255,7 +255,7 @@ class DBHelper {
             table = table || data._tableName;
             db = db || this.db;
             let sql = `INSERT INTO ${table} SET ?`;
-            return this.executeSql(sql, data._dbData, db);
+            return this.executeSql(sql, data.$dbData, db);
         }
         else if (data.db) {
             return data.db.insert(table || data.table, data.data);

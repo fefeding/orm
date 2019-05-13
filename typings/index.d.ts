@@ -187,10 +187,10 @@ declare interface IBaseModel {
 
     /**
      * DB原始数据对象
-     * @property _dbData
+     * @property $dbData
      * @type Object
      */
-    _dbData: object; 
+    $dbData: object; 
 
     /**
      * 当前对应表的唯一健

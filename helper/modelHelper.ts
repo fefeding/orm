@@ -97,7 +97,7 @@ class ModelHelper {
         if(keys && keys.length) {
             for(var i=0;i<keys.length;i++) {
                 let f = target.getFieldName(keys[i]) || keys[i];
-                obj[f] = target[keys[i]] || target._dbData[f];
+                obj[f] = target[keys[i]] || target.$dbData[f];
             }
         }
         return obj;
@@ -160,6 +160,36 @@ class ModelHelper {
             jsonObj[key] = target[key];
         }
         return jsonObj;
+     }
+
+     /**
+      * 生成model的代理对象，拦截其属性的访问
+      * @param target model实例
+      */
+     static createModelProxy(target: BaseModel) {
+          //所有model采用代理方法，从DB中取值
+        return new Proxy<BaseModel>(target, {
+            get: function (target, key, receiver) {                
+                if(typeof key == 'string' && !key.startsWith('_') && !key.startsWith('$')) {
+                    let pros = ModelHelper.getPropertyNames(target);
+                    if(pros.includes(key)) {
+                        let v = target.getValue(key, receiver);
+                        if(typeof v != 'undefined') return v;
+                    }
+                }
+                return Reflect.get(target, key, receiver);
+            },
+            set: function (target, key, value, receiver) {                
+                if(typeof key == 'string' && !key.startsWith('_') && !key.startsWith('$')) {
+                    let pros = ModelHelper.getPropertyNames(target);
+                    if(pros.includes(key)) {
+                        target.setValue(key, value, receiver);
+                        return true;
+                    }
+                }
+                return Reflect.set(target, key, value, receiver);
+            }
+          });
      }
 }
 

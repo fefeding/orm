@@ -193,7 +193,7 @@ class DBHelper implements IDBHelper {
         
         db = (pars instanceof BaseModel? db: pars.db) || this.db;
         table = table || (pars instanceof BaseModel? pars._tableName: pars.table);
-        let data = pars instanceof BaseModel? pars._dbData: pars.data;
+        let data = pars instanceof BaseModel? pars.$dbData: pars.data;
         //生成更新主健
         let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
         
@@ -267,7 +267,7 @@ class DBHelper implements IDBHelper {
             table = table || data._tableName;
             db = db || this.db; 
             let sql = `INSERT INTO ${table} SET ?`;
-            return this.executeSql(sql, data._dbData, db);            
+            return this.executeSql(sql, data.$dbData, db);            
         }   
         else if(data.db) {
             return data.db.insert(table||data.table, data.data);
