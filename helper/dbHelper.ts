@@ -197,8 +197,14 @@ class DBHelper implements IDBHelper {
         //生成更新主健
         let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
         
-        if(db.update) {                
-            return await db.update(table, data, primaryWhere);
+        if(db.update) { 
+            //去掉查询条件的值
+            for(let k in data) {
+                if(k in primaryWhere) delete data[k];
+            }               
+            return await db.update(table, data, {
+                where: primaryWhere
+            });
         }
         else {
             let sql = `UPDATE ${table} SET `;                
@@ -269,7 +275,7 @@ class DBHelper implements IDBHelper {
             let sql = `INSERT INTO ${table} SET ?`;
             return this.executeSql(sql, data.$dbData, db);            
         }   
-        else if(data.db) {
+        else if(data.db && data.db.insert) {
             return data.db.insert(table||data.table, data.data);
         }
     }
