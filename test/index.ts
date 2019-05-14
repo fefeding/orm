@@ -69,10 +69,11 @@ describe('测试DBHelper', ()=>{
     var newid = 0;
     var newmodel: MyModel;
     it('新增一个user', async ()=>{
-        let m = new MyModel();
-        m.name = "my name";
-        m.nickName = "my";
-        console.log(m.toString());
+        let m = new MyModel({
+            name: "my name1",
+            nickName: 'my'
+        });
+        console.log('insert', m.toJSON());
 
         let ret1 = await db.insert(m); 
         assert.ok(ret1.insertId > 0);

@@ -29,14 +29,13 @@ class BaseModel implements IBaseModel {
         if(data) {
             if(typeof data == 'string') {
                 data = JSON.parse(data);
-                Object.assign(this, data);//浅拷贝
             }
             //DB原数据
-            else if(typeof data == 'object' && data.constructor && data.constructor.name == 'RowDataPacket') {
+            if(typeof data == 'object' && data.constructor && data.constructor.name == 'RowDataPacket') {
                 this.$dbData = data;
             }
             else if(typeof data == 'object') {
-                Object.assign(obj, data);//浅拷贝
+                modelHelper.copyProperty(obj, data);//浅拷贝
             }            
         }        
         this._fieldMap = Object.assign(this._fieldMap||{}, map);       
@@ -149,14 +148,16 @@ class BaseModel implements IBaseModel {
       * @param {string} name 属性名 
       * @param {any} value 设置值
       */
-     public setValue(name: string, value: any, receiver?: any): void {
+     public setValue(name: string, value: any, receiver?: any): boolean {
         if(this.$dbData) {
             let field = this.getFieldName(name);
-            this.$dbData[field] = value;
+            if(field) {
+                this.$dbData[field] = value;
+                return true;
+            }
         }
-        else {
-            Reflect.set(this, name, value, receiver);
-        }
+        
+        return Reflect.set(this, name, value, receiver);        
      }
 
      /**

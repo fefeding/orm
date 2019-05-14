@@ -191,6 +191,20 @@ class ModelHelper {
             }
           });
      }
+
+     /**
+      * 复制属性到model实例
+      * @param target 需要修改属性的model实例
+      * @param source 用来修改model的object
+      */
+     static copyProperty(target: BaseModel, source: any): BaseModel {
+        if(!source || typeof source != 'object') return target;
+        for(let k in source) {            
+            target.setValue(k, source[k]);
+        }
+        
+        return target;
+     }
 }
 
 export default ModelHelper;
