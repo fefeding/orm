@@ -183,6 +183,61 @@ class DBHelper implements IDBHelper {
     }
 
     /**
+     * 查询符合条件的数据条数
+     * @param pars 参数参照query方法
+     * @param type[optional] 类型
+     */
+    async count(pars: IDBQueryParam, type?: { new(): BaseModel}|any) {
+        let newpars: IDBQueryParam = {};
+        Object.assign(newpars, pars);
+        newpars.columns = 'count(*) as count';
+        delete newpars.limit; //去除限制
+        delete newpars.orders;
+
+        newpars.db = pars.db || this.db;
+        if(type && !pars.table) newpars.table = type._tableName;
+        
+        let data: any;
+        //where为字符串的情况，则拼sql来执行
+        if(newpars.where && typeof newpars.where == 'string') {            
+            data = await this.queryStringWhere(newpars);
+        }
+        //where为object情况，直接select
+        else if(newpars.where && typeof newpars.where == 'object') {
+            data = await this.select(newpars, type);
+        }
+        if(data && data.length) return data[0]['count'];
+        return 0;
+    }
+
+    /**
+     * 分页查询
+     * @param pars {IDBPagingQueryParam} 分页查询条件和参数，
+     * @param type 数据对应的model
+     */
+    async queryPage(pars: IDBPagingQueryParam, type?: { new(): BaseModel}|any): Promise<IDBPagingResult> {
+        let result = {
+            count: 0,
+            total: 0, //总页数
+            page: pars.page || 0,
+            size: pars.size || 0,
+            data: Array<any>()
+        };
+        //总数据条数
+        result.count = await this.count(pars, type);
+        if(result.count <= 0) {
+            return result;
+        }  
+        if(pars.size > 0) {
+            pars.limit = pars.size;
+            pars.offset = pars.limit * pars.page;
+            result.total = Math.ceil(result.count / pars.size);            
+        }
+        result.data = (await this.query(pars, type)).data;
+        return result;
+    }
+
+    /**
      * 更新数据
      * 指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
      * @param pars {BaseModel|IDBOperationParam} 需要更新model对象，或操作指定

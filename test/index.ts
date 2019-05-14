@@ -166,6 +166,36 @@ describe('测试DBHelper', ()=>{
         assert.ok(data.data.length > 0);
     });
 
+    it('查询符合条件的数，count', async ()=>{
+        //where 查询
+        let data = await db.count({
+            columns: '*',
+            table: tablename,
+            where: {
+                Fid: newid
+            },
+            orders: [['Fcreate_time', 'desc'], ['Fnick_name', 'desc']],
+            offset: 0, //起始
+            limit: 3    //条数
+        }, MyModel);
+        assert.ok(data > 0);
+    });
+
+    it('分页查询，queryPage', async ()=>{
+        //where 查询
+        let data = await db.queryPage({
+            columns: '*',
+            table: tablename,
+            where: `Fname like ?`,
+            params: ['%m%'],
+            orders: [['Fcreate_time', 'desc'], ['Fnick_name', 'desc']],
+            page: 2, //页码
+            size: 3    //每页条数
+        }, MyModel);
+        console.log(data);
+        assert.ok(data.total > 0 && data.count > 0);
+    });
+
     it('删除', async ()=>{        
         let ret = await db.delete(newmodel);
         console.log(ret);
