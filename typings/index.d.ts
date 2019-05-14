@@ -299,6 +299,13 @@ declare interface IDBHelper {
      * @returns {IDBResult}
      */
     async query(pars: IDBQueryParam, type?: { new(): BaseModel}|any): Promise<IDBResult>;
+    
+    /**
+     * 分页查询
+     * @param pars {IDBPagingQueryParam} 分页查询条件和参数，
+     * @param type 数据对应的model
+     */
+    async queryPage(pars: IDBPagingQueryParam, type?: { new(): BaseModel}|any): Promise<IDBPagingResult>;
 
     /**
      * 执行SQL
