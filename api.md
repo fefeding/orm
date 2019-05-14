@@ -58,6 +58,8 @@
         * [.queryStringWhere(pars)](#DBHelper+queryStringWhere)
         * [.get(pars)](#DBHelper+get)
         * [.select(pars, type)](#DBHelper+select)
+        * [.count(pars, type[optional)](#DBHelper+count)
+        * [.queryPage(pars, type)](#DBHelper+queryPage)
         * [.update(pars, table, db)](#DBHelper+update)
         * [.delete(pars, table, db)](#DBHelper+delete)
         * [.insert(data, table, db)](#DBHelper+insert) ⇒ <code>IDBExecuteResult</code>
@@ -132,6 +134,30 @@
 | --- | --- | --- |
 | pars | <code>IDBQueryParam</code> | select参数，where为object情况 |
 | type | [<code>BaseModel</code>](#BaseModel) \| <code>type</code> | 指定model类或实例 |
+
+<a name="DBHelper+count"></a>
+
+### dbHelper.count(pars, type[optional)
+查询符合条件的数据条数
+
+**Kind**: instance method of [<code>DBHelper</code>](#DBHelper)  
+
+| Param | Description |
+| --- | --- |
+| pars | 参数参照query方法 |
+| type[optional | 类型 |
+
+<a name="DBHelper+queryPage"></a>
+
+### dbHelper.queryPage(pars, type)
+分页查询
+
+**Kind**: instance method of [<code>DBHelper</code>](#DBHelper)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| pars | <code>IDBPagingQueryParam</code> | 分页查询条件和参数， |
+| type |  | 数据对应的model |
 
 <a name="DBHelper+update"></a>
 
@@ -212,6 +238,8 @@ TS 反射的一些封装
     * [.getPrimaryKeysWhere(target)](#ModelHelper.getPrimaryKeysWhere)
     * [.createSqlWhere(obj, type)](#ModelHelper.createSqlWhere)
     * [.objectToFieldValues(obj, type)](#ModelHelper.objectToFieldValues)
+    * [.createModelProxy(target)](#ModelHelper.createModelProxy)
+    * [.copyProperty(target, source)](#ModelHelper.copyProperty)
 
 <a name="ModelHelper.getPropertyNames"></a>
 
@@ -297,6 +325,29 @@ TS 反射的一些封装
 | obj | <code>object</code> | 原值对象 |
 | type | <code>class</code> \| [<code>BaseModel</code>](#BaseModel) | 对应的model类 |
 
+<a name="ModelHelper.createModelProxy"></a>
+
+### ModelHelper.createModelProxy(target)
+生成model的代理对象，拦截其属性的访问
+
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
+
+| Param | Description |
+| --- | --- |
+| target | model实例 |
+
+<a name="ModelHelper.copyProperty"></a>
+
+### ModelHelper.copyProperty(target, source)
+复制属性到model实例
+
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
+
+| Param | Description |
+| --- | --- |
+| target | 需要修改属性的model实例 |
+| source | 用来修改model的object |
+
 <a name="BaseModel"></a>
 
 ## BaseModel
@@ -316,7 +367,7 @@ TS 反射的一些封装
         * [._fieldMap](#BaseModel._fieldMap) : <code>Map</code>
         * [.toArray(data)](#BaseModel.toArray) ⇒ <code>Array.&lt;any&gt;</code>
         * [.Table(name, [optional])](#BaseModel.Table)
-        * [.TableField(field)](#BaseModel.TableField)
+        * [.TableField(field, [optional])](#BaseModel.TableField)
         * [.TablePrimaryKey()](#BaseModel.TablePrimaryKey)
 
 <a name="new_BaseModel_new"></a>
@@ -427,7 +478,7 @@ TS 反射的一些封装
 
 <a name="BaseModel.TableField"></a>
 
-### BaseModel.TableField(field)
+### BaseModel.TableField(field, [optional])
 表字段装饰器
 
 **Kind**: static method of [<code>BaseModel</code>](#BaseModel)  
@@ -435,6 +486,7 @@ TS 反射的一些封装
 | Param | Type | Description |
 | --- | --- | --- |
 | field | <code>String</code> | 字段名 |
+| [optional] | <code>Boolean</code> | isPrimary 是否为主健，不设置则不处理 |
 
 <a name="BaseModel.TablePrimaryKey"></a>
 

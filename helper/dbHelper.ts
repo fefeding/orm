@@ -248,7 +248,7 @@ class DBHelper implements IDBHelper {
         
         db = (pars instanceof BaseModel? db: pars.db) || this.db;
         table = table || (pars instanceof BaseModel? pars._tableName: pars.table);
-        let data = pars instanceof BaseModel? pars.$dbData: pars.data;
+        let data = Object.assign({}, pars instanceof BaseModel? pars.$dbData: pars.data);
         //生成更新主健
         let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
         
