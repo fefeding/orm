@@ -139,7 +139,7 @@ class BaseModel implements IBaseModel {
         let field = this.getFieldName(name);
         if(field) return this.$dbData[field];
         else {
-            return Reflect.get(this, name, receiver);
+            return receiver && Reflect.get(this, name, receiver);
         }
      }
      /**
@@ -157,7 +157,7 @@ class BaseModel implements IBaseModel {
             }
         }
         
-        return Reflect.set(this, name, value, receiver);        
+        return receiver && Reflect.set(this, name, value, receiver);        
      }
 
      /**
