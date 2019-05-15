@@ -58,19 +58,45 @@ class ModelHelper {
      static getFieldName<T extends BaseModel>(name: string, type: { new(): T, $fieldMap: object;}|BaseModel): string {
         if(!type) return name;
         if(name.startsWith('_') || name.startsWith('$')) return "";
-         //映射是 field: property
+         //映射是 property:field
          //如果从映射中找到，则直接返回即可         
          if(type && type.$fieldMap && type.$fieldMap[name]) return type.$fieldMap[name];
          let field = name;
          //当不是以F开头时，认为属性名，则需要转为字段名
          if(!/^F/.test(name)) {
-             //把类似于 firstName 这种命名转为 first_name
+             //把类似于 firstName 这种命名转为 Ffirst_name
             field = name.replace(/([A-Z])/g, p => '_' + p.toLowerCase());
             field = 'F' + field;
 
             type && type.$fieldMap && (type.$fieldMap[name] = field); //缓存映射
          }        
          return field;
+     }
+
+     /**
+      * 通过表字段名，找到对应的model属性名
+      * @param name 字段名
+      * @param type model的class类
+      */
+     static getPropertyName<T extends BaseModel>(name: string, type?: { new(): T, $fieldMap: object;}|BaseModel): string {
+        
+        if(name.startsWith('$')) return "";
+         //映射是 property:field
+         //如果从映射中找到，则直接返回即可         
+         if(type && type.$fieldMap) {
+             for(let k in type.$fieldMap) {
+                 if(type.$fieldMap[k] === name) return k;
+             }
+         }
+         
+         //当不是以F开头时，认为属性名，则需要转为字段名
+         if(/^F/.test(name)) {
+              //把类似于 Ffirst_name 这种命名转为 firstName
+            let pro = name.replace(/^F/, '').replace(/_([A-z])/g, (_p, c) => c.toUpperCase());
+            type && type.$fieldMap && (type.$fieldMap[pro] = name); //缓存映射
+            return pro;
+         }        
+         return name;
      }
 
      /**

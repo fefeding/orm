@@ -125,7 +125,11 @@ describe('测试DBHelper', ()=>{
         let m = new MyModel();
         m.id = newid;
         m.nickName = "update name";   
-        let ret = await db.update(m);
+        m.name = "test name";
+
+        let ret = await db.update(m, (k: string) => {
+            if(k === 'name') return false; //不更新name属性
+        });
         assert.equal(ret.affectedRows, 1, 'executeSql');
     });
 
@@ -135,7 +139,7 @@ describe('测试DBHelper', ()=>{
             sql: `select * from ${tablename} where Fname like ? limit 2`,
             params: ['%name%']
         }, MyModel);
-        //console.log(JSON.stringify(data));
+        console.log(JSON.stringify(data));
         assert.ok(data.data.length > 0, 'sql查询');
     });
 

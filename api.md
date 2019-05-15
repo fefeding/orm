@@ -60,7 +60,7 @@
         * [.select(pars, type)](#DBHelper+select)
         * [.count(pars, type[optional)](#DBHelper+count)
         * [.queryPage(pars, type)](#DBHelper+queryPage)
-        * [.update(pars, table, db)](#DBHelper+update)
+        * [.update(pars, table, db, filter)](#DBHelper+update)
         * [.delete(pars, table, db)](#DBHelper+delete)
         * [.insert(data, table, db)](#DBHelper+insert) ⇒ <code>IDBExecuteResult</code>
         * [.executeSql(sql, params, db)](#DBHelper+executeSql)
@@ -161,7 +161,7 @@
 
 <a name="DBHelper+update"></a>
 
-### dbHelper.update(pars, table, db)
+### dbHelper.update(pars, table, db, filter)
 更新数据指定table 和 where 即可。如：{table: 'table1', where: {id:1}}
 
 **Kind**: instance method of [<code>DBHelper</code>](#DBHelper)  
@@ -171,6 +171,7 @@
 | pars | [<code>BaseModel</code>](#BaseModel) \| <code>IDBOperationParam</code> | 需要更新model对象，或操作指定 |
 | table | <code>String</code> | [optinal] 表名，如果不指定则从pars中读 |
 | db | <code>any</code> | [optional] 当前DB连接，不指定则用当前实例DB |
+| filter | <code>function</code> | [optional] 过滤掉不更新的属性 |
 
 <a name="DBHelper+delete"></a>
 
@@ -234,6 +235,7 @@ TS 反射的一些封装
     * [.getPropertyNames(target)](#ModelHelper.getPropertyNames) ⇒ <code>Array.&lt;string&gt;</code>
     * [.toArray(data)](#ModelHelper.toArray) ⇒ <code>Array.&lt;Model&gt;</code>
     * [.getFieldName(name, type)](#ModelHelper.getFieldName)
+    * [.getPropertyName(name, type)](#ModelHelper.getPropertyName)
     * [.convertFields(columns)](#ModelHelper.convertFields)
     * [.getPrimaryKeysWhere(target)](#ModelHelper.getPrimaryKeysWhere)
     * [.createSqlWhere(obj, type)](#ModelHelper.createSqlWhere)
@@ -274,6 +276,18 @@ TS 反射的一些封装
 | Param | Description |
 | --- | --- |
 | name | model中的属性名 |
+| type | model的class类 |
+
+<a name="ModelHelper.getPropertyName"></a>
+
+### ModelHelper.getPropertyName(name, type)
+通过表字段名，找到对应的model属性名
+
+**Kind**: static method of [<code>ModelHelper</code>](#ModelHelper)  
+
+| Param | Description |
+| --- | --- |
+| name | 字段名 |
 | type | model的class类 |
 
 <a name="ModelHelper.convertFields"></a>

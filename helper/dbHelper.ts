@@ -243,14 +243,36 @@ class DBHelper implements IDBHelper {
      * @param pars {BaseModel|IDBOperationParam} 需要更新model对象，或操作指定
      * @param table {String}[optinal] 表名，如果不指定则从pars中读
      * @param db {any}[optional] 当前DB连接，不指定则用当前实例DB
+     * @param filter {Function}[optional] 过滤掉不更新的属性
      */
-    async update(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult> {
+    async update(pars: IDBOperationParam|BaseModel, table?: string|Function, db?: any|Function, filter?: Function): Promise<IDBExecuteResult> {
         
+        if(typeof table === 'function') {
+            filter = table;
+            table = '';
+        }
+        else if(typeof db === 'function') {
+            filter = db;
+            db = null;
+        }
         db = (pars instanceof BaseModel? db: pars.db) || this.db;
         table = table || (pars instanceof BaseModel? pars.$tableName: pars.table);
         let data = Object.assign({}, pars instanceof BaseModel? pars.$dbData: pars.data);
         //生成更新主健
         let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
+        
+        //如果有指定过滤掉不用更新的属性
+        if(filter) {
+            for(let k in data) {
+                let name = k;
+                if(pars instanceof BaseModel) {
+                    name = modelHelper.getPropertyName(k, pars);
+                }
+                if(filter(name, k, data) === false) {                    
+                    delete data[k];
+                }
+            }
+        }
         
         if(db.update) { 
             //去掉查询条件的值
