@@ -55,12 +55,12 @@ class ModelHelper {
       * @param name model中的属性名
       * @param type model的class类
       */
-     static getFieldName<T extends BaseModel>(name: string, type: { new(): T, _fieldMap: object;}|BaseModel): string {
+     static getFieldName<T extends BaseModel>(name: string, type: { new(): T, $fieldMap: object;}|BaseModel): string {
         if(!type) return name;
         if(name.startsWith('_') || name.startsWith('$')) return "";
          //映射是 field: property
          //如果从映射中找到，则直接返回即可         
-         if(type && type._fieldMap && type._fieldMap[name]) return type._fieldMap[name];
+         if(type && type.$fieldMap && type.$fieldMap[name]) return type.$fieldMap[name];
          let field = name;
          //当不是以F开头时，认为属性名，则需要转为字段名
          if(!/^F/.test(name)) {
@@ -68,7 +68,7 @@ class ModelHelper {
             field = name.replace(/([A-Z])/g, p => '_' + p.toLowerCase());
             field = 'F' + field;
 
-            type && type._fieldMap && (type._fieldMap[name] = field); //缓存映射
+            type && type.$fieldMap && (type.$fieldMap[name] = field); //缓存映射
          }        
          return field;
      }
@@ -77,7 +77,7 @@ class ModelHelper {
       * 把属性集合转为字段集合
       * @param columns 属性的集合
       */
-     static convertFields(columns: Array<string>, type: { new(): BaseModel, _fieldMap: object;}|BaseModel): Array<string> {
+     static convertFields(columns: Array<string>, type: { new(): BaseModel, $fieldMap: object;}|BaseModel): Array<string> {
         if(!type) return columns;
         let ret = new Array<string>();
         for(let i=0;i<columns.length;i++) {
@@ -93,7 +93,7 @@ class ModelHelper {
       */
      static getPrimaryKeysWhere(target: BaseModel): object {
         let obj = {};
-        let keys = target._primaryKeys;
+        let keys = target.$primaryKeys;
         if(keys && keys.length) {
             for(var i=0;i<keys.length;i++) {
                 let f = target.getFieldName(keys[i]) || keys[i];
@@ -113,7 +113,7 @@ class ModelHelper {
       * @param obj {object} sql条件参数
       * @param type {BaseModel|class} 指定类型，如果不指定则字段按属性名，指定了就会去取映射的字段名
       */
-     static createSqlWhere(obj: object, type?: { new(): BaseModel, _fieldMap: object;}|BaseModel): {where: string, params: Array<any>} {
+     static createSqlWhere(obj: object, type?: { new(): BaseModel, $fieldMap: object;}|BaseModel): {where: string, params: Array<any>} {
          let result = {
              where: "",
              params: new Array<any>()
@@ -136,7 +136,7 @@ class ModelHelper {
       * @param obj {object} 原值对象
       * @param type {class|BaseModel} 对应的model类
       */
-     static objectToFieldValues(obj: object, type: { new(): BaseModel, _fieldMap: object;}|BaseModel): object {
+     static objectToFieldValues(obj: object, type: { new(): BaseModel, $fieldMap: object;}|BaseModel): object {
         let ret = {};
         for(var k in obj) {
             let f = this.getFieldName(k, type) || k;
@@ -200,7 +200,7 @@ class ModelHelper {
      static copyProperty(target: BaseModel, source: any): BaseModel {
         if(!source || typeof source != 'object') return target;
         for(let k in source) {            
-            target.setValue(k, source[k]);
+            target.setValue(k, source[k], target);
         }
         
         return target;

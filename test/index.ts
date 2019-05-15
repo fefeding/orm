@@ -71,7 +71,8 @@ describe('测试DBHelper', ()=>{
     it('新增一个user', async ()=>{
         let m = new MyModel({
             name: "my name1",
-            nickName: 'my'
+            nickName: 'my',
+            $tableName: tablename //这里可以不指定，只是为了测试
         });
         console.log('insert', m.toJSON());
 

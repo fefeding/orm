@@ -358,13 +358,13 @@ TS 反射的一些封装
 * [BaseModel](#BaseModel)
     * [new BaseModel(data, map)](#new_BaseModel_new)
     * _instance_
-        * [._primaryKeys](#BaseModel+_primaryKeys) : <code>Array.&lt;string&gt;</code>
-        * [._tableName](#BaseModel+_tableName) : <code>string</code>
-        * [._fieldMap](#BaseModel+_fieldMap) : <code>Map</code>
+        * [.$primaryKeys](#BaseModel+$primaryKeys) : <code>Array.&lt;string&gt;</code>
+        * [.$tableName](#BaseModel+$tableName) : <code>string</code>
+        * [.$fieldMap](#BaseModel+$fieldMap) : <code>Map</code>
     * _static_
-        * [._primaryKeys](#BaseModel._primaryKeys) : <code>Array.&lt;string&gt;</code>
-        * [._tableName](#BaseModel._tableName) : <code>string</code>
-        * [._fieldMap](#BaseModel._fieldMap) : <code>Map</code>
+        * [.$primaryKeys](#BaseModel.$primaryKeys) : <code>Array.&lt;string&gt;</code>
+        * [.$tableName](#BaseModel.$tableName) : <code>string</code>
+        * [.$fieldMap](#BaseModel.$fieldMap) : <code>Map</code>
         * [.toArray(data)](#BaseModel.toArray) ⇒ <code>Array.&lt;any&gt;</code>
         * [.Table(name, [optional])](#BaseModel.Table)
         * [.TableField(field, [optional])](#BaseModel.TableField)
@@ -381,9 +381,9 @@ TS 反射的一些封装
 | data | <code>Object/String</code> | 如果传入object会当做DB表数据来映射，如果是model对象，则进行浅拷贝。如果是字符串只进行json转换 |
 | map | <code>Object</code> | 字段跟属性的映射，一般不需要指定，除非需要特殊  格式：{property: field} |
 
-<a name="BaseModel+_primaryKeys"></a>
+<a name="BaseModel+$primaryKeys"></a>
 
-### baseModel.\_primaryKeys : <code>Array.&lt;string&gt;</code>
+### baseModel.$primaryKeys : <code>Array.&lt;string&gt;</code>
 当前对应表的唯一健
 
 **Kind**: instance property of [<code>BaseModel</code>](#BaseModel)  
@@ -391,11 +391,11 @@ TS 反射的一些封装
 
 | Name |
 | --- |
-| _primaryKeys | 
+| $primaryKeys | 
 
-<a name="BaseModel+_tableName"></a>
+<a name="BaseModel+$tableName"></a>
 
-### baseModel.\_tableName : <code>string</code>
+### baseModel.$tableName : <code>string</code>
 对应的表名
 
 **Kind**: instance property of [<code>BaseModel</code>](#BaseModel)  
@@ -403,11 +403,11 @@ TS 反射的一些封装
 
 | Name |
 | --- |
-| _tableName | 
+| $tableName | 
 
-<a name="BaseModel+_fieldMap"></a>
+<a name="BaseModel+$fieldMap"></a>
 
-### baseModel.\_fieldMap : <code>Map</code>
+### baseModel.$fieldMap : <code>Map</code>
 表字段跟对象属性的映射格式：{property: field}
 
 **Kind**: instance property of [<code>BaseModel</code>](#BaseModel)  
@@ -415,11 +415,11 @@ TS 反射的一些封装
 
 | Name |
 | --- |
-| _fieldMap | 
+| $fieldMap | 
 
-<a name="BaseModel._primaryKeys"></a>
+<a name="BaseModel.$primaryKeys"></a>
 
-### BaseModel.\_primaryKeys : <code>Array.&lt;string&gt;</code>
+### BaseModel.$primaryKeys : <code>Array.&lt;string&gt;</code>
 当前对应表的唯一健
 
 **Kind**: static property of [<code>BaseModel</code>](#BaseModel)  
@@ -427,11 +427,11 @@ TS 反射的一些封装
 
 | Name |
 | --- |
-| _primaryKeys | 
+| $primaryKeys | 
 
-<a name="BaseModel._tableName"></a>
+<a name="BaseModel.$tableName"></a>
 
-### BaseModel.\_tableName : <code>string</code>
+### BaseModel.$tableName : <code>string</code>
 对应的表名
 
 **Kind**: static property of [<code>BaseModel</code>](#BaseModel)  
@@ -441,9 +441,9 @@ TS 反射的一些封装
 | --- |
 | tableName | 
 
-<a name="BaseModel._fieldMap"></a>
+<a name="BaseModel.$fieldMap"></a>
 
-### BaseModel.\_fieldMap : <code>Map</code>
+### BaseModel.$fieldMap : <code>Map</code>
 表字段跟对象属性的映射格式：{property: field}
 
 **Kind**: static property of [<code>BaseModel</code>](#BaseModel)  
@@ -451,7 +451,7 @@ TS 反射的一些封装
 
 | Name |
 | --- |
-| _fieldMap | 
+| $fieldMap | 
 
 <a name="BaseModel.toArray"></a>
 

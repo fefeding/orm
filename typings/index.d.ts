@@ -194,48 +194,48 @@ declare interface IBaseModel {
 
     /**
      * 当前对应表的唯一健
-     * @property _primaryKeys
+     * @property $primaryKeys
      * @type Array<string>
      */
-    _primaryKeys: Array<string>;
+    $primaryKeys: Array<string>;
 
     /**
      * 当前对应表的唯一健
      * @static
-     * @property _primaryKeys
+     * @property $primaryKeys
      * @type Array<string>
      */
-    static _primaryKeys: Array<string>;
+    static $primaryKeys: Array<string>;
 
     /**
      * 对应的表名
-     * @property _tableName
+     * @property $tableName
      * @type string
      */
-    _tableName: string;
+    $tableName: string;
     /**
      * 对应的表名
      * @static
      * @property tableName
      * @type string
      */
-    static _tableName: string;
+    static $tableName: string;
 
     /**
      * 表字段跟对象属性的映射
      * 格式：{property: field}
-     * @property _fieldMap
+     * @property $fieldMap
      * @type Map
      */
-    _fieldMap: object;
+    $fieldMap: object;
 
     /**
      * 表字段跟对象属性的映射
      * 格式：{property: field}
-     * @property _fieldMap
+     * @property $fieldMap
      * @type Map
      */
-    static _fieldMap: object;
+    static $fieldMap: object;
 
      /**
       * 从DB数据源中读取属性值
@@ -331,7 +331,7 @@ declare interface IDBHelper {
      * @param pars {IDBQueryParam} select参数，where为object情况
      * @param type {BaseModel|type} 指定model类或实例
      */
-    async select(pars: IDBQueryParam, type: {new():BaseModel, _fieldMap: object;}|BaseModel): Promise<any>;
+    async select(pars: IDBQueryParam, type: {new():BaseModel, $fieldMap: object;}|BaseModel): Promise<any>;
 
     /**
      * 更新数据

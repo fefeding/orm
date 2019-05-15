@@ -50,7 +50,7 @@ class DBHelper implements IDBHelper {
         pars.columns = pars.columns || '*';
         
         pars.db = pars.db || this.db;
-        if(type && !pars.table) pars.table = type._tableName;
+        if(type && !pars.table) pars.table = type.$tableName;
         if(pars.sql) {
             result.data = await this.execute(pars);
         }
@@ -115,7 +115,7 @@ class DBHelper implements IDBHelper {
      * @param pars {IDBQueryParam} 获取单条数据接口，{table:'table1', where: {id:1}}
      */
     async get(pars: IDBQueryParam, type?: { new(): BaseModel}|any): Promise<any> {
-        if(type && !pars.table) pars.table = type._tableName;
+        if(type && !pars.table) pars.table = type.$tableName;
         pars.db = pars.db || this.db;
         if(pars.db.get) {
             //如果有传类型，则会做一次属性到字段的映射
@@ -148,7 +148,7 @@ class DBHelper implements IDBHelper {
      * @param pars {IDBQueryParam} select参数，where为object情况
      * @param type {BaseModel|type} 指定model类或实例
      */
-    async select(pars: IDBQueryParam, type: {new():BaseModel, _fieldMap: object;}|BaseModel): Promise<any> {
+    async select(pars: IDBQueryParam, type: {new():BaseModel, $fieldMap: object;}|BaseModel): Promise<any> {
         pars.db = pars.db || this.db;
         //如果是数组，则做一次字段映射，并转为字符串
         let columns = pars.columns || '*';
@@ -195,7 +195,7 @@ class DBHelper implements IDBHelper {
         delete newpars.orders;
 
         newpars.db = pars.db || this.db;
-        if(type && !pars.table) newpars.table = type._tableName;
+        if(type && !pars.table) newpars.table = type.$tableName;
         
         let data: any;
         //where为字符串的情况，则拼sql来执行
@@ -247,7 +247,7 @@ class DBHelper implements IDBHelper {
     async update(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult> {
         
         db = (pars instanceof BaseModel? db: pars.db) || this.db;
-        table = table || (pars instanceof BaseModel? pars._tableName: pars.table);
+        table = table || (pars instanceof BaseModel? pars.$tableName: pars.table);
         let data = Object.assign({}, pars instanceof BaseModel? pars.$dbData: pars.data);
         //生成更新主健
         let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
@@ -291,7 +291,7 @@ class DBHelper implements IDBHelper {
      */
     async delete(pars: IDBOperationParam|BaseModel, table?: string, db?: any): Promise<IDBExecuteResult> {
         db = (pars instanceof BaseModel? db: pars.db) || this.db;
-        table = table || (pars instanceof BaseModel? pars._tableName: pars.table);
+        table = table || (pars instanceof BaseModel? pars.$tableName: pars.table);
         
         //生成删除主健
         let primaryWhere = pars instanceof BaseModel? modelHelper.getPrimaryKeysWhere(pars): pars.where;
@@ -325,7 +325,7 @@ class DBHelper implements IDBHelper {
     async insert(data: IDBOperationParam|BaseModel, table: string = "", db: any = null): Promise<any> {          
         //如果是IDBOperationParam，则调用eggjs相关接口
         if(data && data instanceof BaseModel) {
-            table = table || data._tableName;
+            table = table || data.$tableName;
             db = db || this.db; 
             let sql = `INSERT INTO ${table} SET ?`;
             return this.executeSql(sql, data.$dbData, db);            

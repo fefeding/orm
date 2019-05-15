@@ -38,7 +38,7 @@ class BaseModel implements IBaseModel {
                 modelHelper.copyProperty(obj, data);//浅拷贝
             }            
         }        
-        this._fieldMap = Object.assign(this._fieldMap||{}, map);       
+        this.$fieldMap = Object.assign(this.$fieldMap||{}, map);       
         
         return obj;
      } 
@@ -52,40 +52,40 @@ class BaseModel implements IBaseModel {
 
     /**
      * 当前对应表的唯一健
-     * @property _primaryKeys
+     * @property $primaryKeys
      * @type Array<string>
      */
-    public get _primaryKeys(): Array<string> {
+    public get $primaryKeys(): Array<string> {
         let proto = Object.getPrototypeOf(this);
         return proto[PrimaryKeyId];
     }
-    public set _primaryKeys(value: Array<string>) {
+    public set $primaryKeys(value: Array<string>) {
         let proto = Object.getPrototypeOf(this);
         proto[PrimaryKeyId] = value;
     }
     /**
      * 当前对应表的唯一健
      * @static
-     * @property _primaryKeys
+     * @property $primaryKeys
      * @type Array<string>
      */
-    public static get _primaryKeys(): Array<string> {
+    public static get $primaryKeys(): Array<string> {
         return this.prototype[PrimaryKeyId];
     }
-    public static set _primaryKeys(value) {
+    public static set $primaryKeys(value) {
         this.prototype[PrimaryKeyId] = value;
     }
 
     /**
      * 对应的表名
-     * @property _tableName
+     * @property $tableName
      * @type string
      */
-    public get _tableName(): string {
+    public get $tableName(): string {
         let proto = Object.getPrototypeOf(this);
         return proto[TableNameId];
     }
-    public set _tableName(value: string) {
+    public set $tableName(value: string) {
         let proto = Object.getPrototypeOf(this);
         proto[TableNameId] = value;
     }
@@ -95,37 +95,37 @@ class BaseModel implements IBaseModel {
      * @property tableName
      * @type string
      */
-    public static get _tableName(): string {
+    public static get $tableName(): string {
         return this.prototype[TableNameId];
     }
-    public static set _tableName(value) {
+    public static set $tableName(value) {
         this.prototype[TableNameId] = value;
     }
 
     /**
      * 表字段跟对象属性的映射
      * 格式：{property: field}
-     * @property _fieldMap
+     * @property $fieldMap
      * @type Map
      */
-    public get _fieldMap(): object {
+    public get $fieldMap(): object {
         let proto = Object.getPrototypeOf(this);
         return proto[TableFieldMapId];
     }
-    public set _fieldMap(value: object) {
+    public set $fieldMap(value: object) {
         let proto = Object.getPrototypeOf(this);
         proto[TableFieldMapId] = value;
     }
     /**
      * 表字段跟对象属性的映射
      * 格式：{property: field}
-     * @property _fieldMap
+     * @property $fieldMap
      * @type Map
      */
-    public static get _fieldMap(): object {
+    public static get $fieldMap(): object {
         return this.prototype[TableFieldMapId];
     }
-    public static set _fieldMap(value: object) {
+    public static set $fieldMap(value: object) {
         this.prototype[TableFieldMapId] = value;
     }     
 
@@ -139,7 +139,7 @@ class BaseModel implements IBaseModel {
         let field = this.getFieldName(name);
         if(field) return this.$dbData[field];
         else {
-            return receiver && Reflect.get(this, name, receiver);
+            return receiver && Reflect.get(this, name, receiver||this);
         }
      }
      /**
@@ -156,8 +156,7 @@ class BaseModel implements IBaseModel {
                 return true;
             }
         }
-        
-        return receiver && Reflect.set(this, name, value, receiver);        
+        return Reflect.set(this, name, value, receiver||this);        
      }
 
      /**

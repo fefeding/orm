@@ -46,7 +46,7 @@ class DBHelper {
         pars.columns = pars.columns || '*';
         pars.db = pars.db || this.db;
         if (type && !pars.table)
-            pars.table = type._tableName;
+            pars.table = type.$tableName;
         if (pars.sql) {
             result.data = await this.execute(pars);
         }
@@ -110,7 +110,7 @@ class DBHelper {
      */
     async get(pars, type) {
         if (type && !pars.table)
-            pars.table = type._tableName;
+            pars.table = type.$tableName;
         pars.db = pars.db || this.db;
         if (pars.db.get) {
             //如果有传类型，则会做一次属性到字段的映射
@@ -188,7 +188,7 @@ class DBHelper {
         delete newpars.orders;
         newpars.db = pars.db || this.db;
         if (type && !pars.table)
-            newpars.table = type._tableName;
+            newpars.table = type.$tableName;
         let data;
         //where为字符串的情况，则拼sql来执行
         if (newpars.where && typeof newpars.where == 'string') {
@@ -237,7 +237,7 @@ class DBHelper {
      */
     async update(pars, table, db) {
         db = (pars instanceof base_1.default ? db : pars.db) || this.db;
-        table = table || (pars instanceof base_1.default ? pars._tableName : pars.table);
+        table = table || (pars instanceof base_1.default ? pars.$tableName : pars.table);
         let data = Object.assign({}, pars instanceof base_1.default ? pars.$dbData : pars.data);
         //生成更新主健
         let primaryWhere = pars instanceof base_1.default ? modelHelper_1.default.getPrimaryKeysWhere(pars) : pars.where;
@@ -281,7 +281,7 @@ class DBHelper {
      */
     async delete(pars, table, db) {
         db = (pars instanceof base_1.default ? db : pars.db) || this.db;
-        table = table || (pars instanceof base_1.default ? pars._tableName : pars.table);
+        table = table || (pars instanceof base_1.default ? pars.$tableName : pars.table);
         //生成删除主健
         let primaryWhere = pars instanceof base_1.default ? modelHelper_1.default.getPrimaryKeysWhere(pars) : pars.where;
         if (db.delete) {
@@ -312,7 +312,7 @@ class DBHelper {
     async insert(data, table = "", db = null) {
         //如果是IDBOperationParam，则调用eggjs相关接口
         if (data && data instanceof base_1.default) {
-            table = table || data._tableName;
+            table = table || data.$tableName;
             db = db || this.db;
             let sql = `INSERT INTO ${table} SET ?`;
             return this.executeSql(sql, data.$dbData, db);
